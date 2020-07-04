@@ -83,7 +83,7 @@ def load_embeddings(path, word2vec=False, rdf2vec=False):
     """
     embbedding_dict = {}
     if word2vec == False and rdf2vec == False:
-        with codecs.open(path, "rb", "utf8", "ignore") as infile:
+        with codecs.open(path, "r", "utf8", "ignore") as infile:
             for line in infile:
                 try:
                     parts = line.split()
@@ -96,10 +96,10 @@ def load_embeddings(path, word2vec=False, rdf2vec=False):
         return embbedding_dict
     elif word2vec == True:
         #Load Google's pre-trained Word2Vec model.
-        if os.name != 'nt':
-            model = gensim.models.KeyedVectors.load_word2vec_format(path, binary=True)
-        else:
-            model = gensim.models.Word2Vec.load_word2vec_format(path, binary=True)
+        # if os.name != 'nt':
+        model = gensim.models.KeyedVectors.load_word2vec_format(path, binary=True)
+        # else:
+        # model = gensim.models.Word2Vec.load_word2vec_format(path, binary=True)
         return model
     elif rdf2vec == True:
         #Load Petars model.
