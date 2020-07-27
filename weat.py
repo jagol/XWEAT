@@ -15,7 +15,6 @@ from time import time
 from sklearn.metrics.pairwise import euclidean_distances
 
 
-
 class XWEAT(object):
     """
     Perform WEAT (Word Embedding Association Test) bias tests on a language model.
@@ -24,14 +23,22 @@ class XWEAT(object):
     Credits: Basic implementation based on https://gist.github.com/SandyRogers/e5c2e938502a75dcae25216e4fae2da5
     """
 
-    def __init__(self):
+    def __init__(self, gender):
         self.embd_dict = None
         self.vocab = None
         self.embedding_matrix = None
+        self.gender = gender
+        if self.gender == 'both':
+            self.loading_func = self.load_names
+        elif self.gender == 'female':
+            self.loading_func = self.load_female_names
+        elif self.gender == 'male':
+            self.loading_func = self.loading_func
+        else:
+            raise Exception('Gender option not known.')
 
     def set_embd_dict(self, embd_dict):
         self.embd_dict = embd_dict
-
 
     def _build_vocab_dict(self, vocab):
         self.vocab = OrderedDict()
@@ -43,7 +50,6 @@ class XWEAT(object):
                 index += 1
             else:
                 logging.warning("Not in vocab %s", term)
-
 
     def convert_by_vocab(self, items):
         """Converts a sequence of [tokens|ids] using the vocab."""
@@ -64,10 +70,9 @@ class XWEAT(object):
                 raise AssertionError("This should not happen.")
         self.embd_dict = None
 
-
-    def mat_normalize(self,mat, norm_order=2, axis=1):
+    @staticmethod
+    def mat_normalize(mat, norm_order=2, axis=1):
         return mat / np.transpose([np.linalg.norm(mat, norm_order, axis)])
-
 
     def cosine(self, a, b):
         norm_a = self.mat_normalize(a)
@@ -75,14 +80,12 @@ class XWEAT(object):
         cos = np.dot(norm_a, np.transpose(norm_b))
         return cos
 
-
     def euclidean(self, a, b):
         norm_a = self.mat_normalize(a)
         norm_b = self.mat_normalize(b)
         distances = euclidean_distances(norm_a, norm_b)
-        eucl = 1/ (1+distances)
+        eucl = 1 / (1+distances)
         return eucl
-
 
     def csls(self, a, b, k=10):
         norm_a = self.mat_normalize(a)
@@ -93,10 +96,9 @@ class XWEAT(object):
         csls_norms_a = np.mean(np.sort(sims_local_a, axis=1)[:, -k - 1:-1], axis=1)
         csls_norms_b = np.mean(np.sort(sims_local_b, axis=1)[:, -k - 1:-1], axis=1)
         loc_sims = np.add(np.transpose(np.tile(csls_norms_a, (len(csls_norms_b), 1))),
-                                            np.tile(csls_norms_b, (len(csls_norms_a), 1)))
+                          np.tile(csls_norms_b, (len(csls_norms_a), 1)))
 
         return 2 * np.dot(norm_a, np.transpose(norm_b)) - loc_sims
-
 
     def _init_similarities(self, similarity_type):
         if similarity_type == "cosine":
@@ -108,172 +110,188 @@ class XWEAT(object):
         else:
             raise NotImplementedError()
 
-
-    def weat_1(self):
+    @staticmethod
+    def weat_1():
         """
-        WEAT 1 (universally accepted): Targets 1=Flowers, Targets 2=Insects, Attributes 1=pleasant, Attributes 2=unpleasant
+        WEAT 1 (universally accepted): Targets 1=Flowers, Targets 2=Insects, Attributes 1=pleasant,
+        Attributes 2=unpleasant
         :return: targets_1, targets_2, attributes_1, attributes_2
         """
-        targets_1 = ["aster", "clover", "hyacinth", "marigold", "poppy", "azalea", "crocus", "iris", "orchid", "rose",
-                             "blue-bell", "daffodil", "lilac", "pansy", "tulip", "buttercup", "daisy", "lily", "peony", "violet",
-                             "carnation", "gladiola", "magnolia", "petunia", "zinnia"]
-        targets_2 = ["ant", "caterpillar", "flea", "locust", "spider", "bedbug", "centipede", "fly", "maggot", "tarantula",
-                             "bee", "cockroach", "gnat", "mosquito", "termite", "beetle", "cricket", "hornet", "moth", "wasp",
-                             "blackfly",
-                             "dragonfly", "horsefly", "roach", "weevil"]
-        attributes_1 = ["caress", "freedom", "health", "love", "peace", "cheer", "friend", "heaven", "loyal", "pleasure",
-                                "diamond", "gentle", "honest", "lucky", "rainbow", "diploma", "gift", "honor", "miracle", "sunrise",
-                                "family",
-                                "happy", "laughter", "paradise", "vacation"]
-        attributes_2 = ["abuse", "crash", "filth", "murder", "sickness", "accident", "death", "grief", "poison", "stink",
-                                    "assault", "disaster", "hatred", "pollute", "tragedy", "divorce", "jail", "poverty", "ugly", "cancer",
-                                    "kill", "rotten",
-                                    "vomit", "agony", "prison"]
+        targets_1 = [
+            "aster", "clover", "hyacinth", "marigold", "poppy", "azalea", "crocus", "iris", "orchid", "rose",
+            "blue-bell", "daffodil", "lilac", "pansy", "tulip", "buttercup", "daisy", "lily", "peony", "violet",
+            "carnation", "gladiola", "magnolia", "petunia", "zinnia"
+        ]
+        targets_2 = [
+            "ant", "caterpillar", "flea", "locust", "spider", "bedbug", "centipede", "fly", "maggot", "tarantula",
+            "bee", "cockroach", "gnat", "mosquito", "termite", "beetle", "cricket", "hornet", "moth", "wasp",
+            "blackfly", "dragonfly", "horsefly", "roach", "weevil"
+        ]
+        attributes_1 = [
+            "caress", "freedom", "health", "love", "peace", "cheer", "friend", "heaven", "loyal", "pleasure",
+            "diamond", "gentle", "honest", "lucky", "rainbow", "diploma", "gift", "honor", "miracle", "sunrise",
+            "family", "happy", "laughter", "paradise", "vacation"
+        ]
+        attributes_2 = [
+            "abuse", "crash", "filth", "murder", "sickness", "accident", "death", "grief", "poison", "stink",
+            "assault", "disaster", "hatred", "pollute", "tragedy", "divorce", "jail", "poverty", "ugly", "cancer",
+            "kill", "rotten", "vomit", "agony", "prison"
+        ]
         return targets_1, targets_2, attributes_1, attributes_2
-
 
     # WEAT 2: Target 1=Musical instruments, Target 2= Weapons, Attributes 1: pleasant, Attributes 2=unpleasant
-    def weat_2(self):
-        targets_1 = ["bagpipe", "cello", "guitar", "lute", "trombone", "banjo", "clarinet", "harmonica", "mandolin",
-                                 "trumpet", "bassoon", "drum", "harp", "oboe", "tuba", "bell", "fiddle", "harpsichord", "piano",
-                                 "viola", "bongo",
-                                 "flute", "horn", "saxophone", "violin"]
-        targets_2 = ["arrow", "club", "gun", "missile", "spear", "axe", "dagger", "harpoon", "pistol", "sword", "blade",
-                         "dynamite", "hatchet", "rifle", "tank", "bomb", "firearm", "knife", "shotgun", "teargas", "cannon",
-                         "grenade",
-                         "mace", "slingshot", "whip"]
-        attributes_1 = ["caress", "freedom", "health", "love", "peace", "cheer", "friend", "heaven", "loyal", "pleasure",
-                                "diamond", "gentle", "honest", "lucky", "rainbow", "diploma", "gift", "honor", "miracle", "sunrise",
-                                "family", "happy", "laughter", "paradise", "vacation"]
-        attributes_2 = ["abuse", "crash", "filth", "murder", "sickness", "accident", "death", "grief", "poison", "stink",
-                                    "assault", "disaster", "hatred", "pollute", "tragedy", "divorce", "jail", "poverty", "ugly", "cancer",
-                                    "kill", "rotten",
-                                    "vomit", "agony", "prison"]
-
+    @staticmethod
+    def weat_2():
+        targets_1 = [
+            "bagpipe", "cello", "guitar", "lute", "trombone", "banjo", "clarinet", "harmonica", "mandolin",
+            "trumpet", "bassoon", "drum", "harp", "oboe", "tuba", "bell", "fiddle", "harpsichord", "piano",
+            "viola", "bongo", "flute", "horn", "saxophone", "violin"]
+        targets_2 = [
+            "arrow", "club", "gun", "missile", "spear", "axe", "dagger", "harpoon", "pistol", "sword", "blade",
+            "dynamite", "hatchet", "rifle", "tank", "bomb", "firearm", "knife", "shotgun", "teargas", "cannon",
+            "grenade", "mace", "slingshot", "whip"]
+        attributes_1 = [
+            "caress", "freedom", "health", "love", "peace", "cheer", "friend", "heaven", "loyal", "pleasure",
+            "diamond", "gentle", "honest", "lucky", "rainbow", "diploma", "gift", "honor", "miracle", "sunrise",
+            "family", "happy", "laughter", "paradise", "vacation"
+        ]
+        attributes_2 = [
+            "abuse", "crash", "filth", "murder", "sickness", "accident", "death", "grief", "poison", "stink",
+            "assault", "disaster", "hatred", "pollute", "tragedy", "divorce", "jail", "poverty", "ugly", "cancer",
+            "kill", "rotten", "vomit", "agony", "prison"
+        ]
         return targets_1, targets_2, attributes_1, attributes_2
 
-
-    # Here they deleted the infrequent african american names, and the same number randomly choosen from the european american names
-    def weat_3(self):
-        # excluded in the original paper: Chip, Ian, Fred, Jed, Todd, Brandon, Wilbur, Sara, Amber, Crystal, Meredith, Shannon, Donna,
+    # Here they deleted the infrequent african american names, and the same
+    # number randomly choosen from the european american names
+    @staticmethod
+    def weat_3():
+        # excluded in the original paper: Chip, Ian, Fred, Jed, Todd, Brandon, Wilbur, Sara, Amber,
+        # Crystal, Meredith, Shannon, Donna,
         # Bobbie-Sue, Peggy, Sue-Ellen, Wendy
-        targets_1 = ["Adam", "Harry", "Josh", "Roger", "Alan", "Frank", "Justin", "Ryan", "Andrew", "Jack", "Matthew", "Stephen",
-                                 "Brad", "Greg", "Paul", "Hank", "Jonathan", "Peter", "Amanda", "Courtney", "Heather", "Melanie",
-                                 "Katie", "Betsy", "Kristin", "Nancy", "Stephanie", "Ellen", "Lauren",    "Colleen", "Emily", "Megan", "Rachel",
-                                 "Chip", "Ian", "Fred", "Jed", "Todd", "Brandon", "Wilbur", "Sara", "Amber", "Crystal", "Meredith", "Shannon",
-                                 "Donna", "Bobbie-Sue", "Peggy", "Sue-Ellen", "Wendy"]
-
-        # excluded: Lerone, Percell, Rasaan, Rashaun, Everol, Terryl, Aiesha, Lashelle, Temeka, Tameisha, Teretha, Latonya, Shanise,
+        targets_1 = [
+            "Adam", "Harry", "Josh", "Roger", "Alan", "Frank", "Justin", "Ryan", "Andrew", "Jack", "Matthew", "Stephen",
+            "Brad", "Greg", "Paul", "Hank", "Jonathan", "Peter", "Amanda", "Courtney", "Heather", "Melanie", "Katie",
+            "Betsy", "Kristin", "Nancy", "Stephanie", "Ellen", "Lauren",    "Colleen", "Emily", "Megan", "Rachel",
+            "Chip", "Ian", "Fred", "Jed", "Todd", "Brandon", "Wilbur", "Sara", "Amber", "Crystal", "Meredith",
+            "Shannon", "Donna", "Bobbie-Sue", "Peggy", "Sue-Ellen", "Wendy"
+        ]
+        # excluded: Lerone, Percell, Rasaan, Rashaun, Everol, Terryl, Aiesha, Lashelle, Temeka, Tameisha, Teretha,
+        # Latonya, Shanise,
         # Sharise, Tashika, Lashandra, Shavonn, Tawanda,
-        targets_2 = ["Alonzo", "Jamel",    "Theo", "Alphonse", "Jerome", "Leroy", "Torrance", "Darnell", "Lamar", "Lionel",
-                                 "Tyree", "Deion", "Lamont", "Malik", "Terrence", "Tyrone",    "Lavon", "Marcellus", "Wardell", "Nichelle",
-                                 "Shereen", "Ebony", "Latisha", "Shaniqua", "Jasmine", "Tanisha", "Tia", "Lakisha", "Latoya",    "Yolanda",
-                                 "Malika",    "Yvette", "Lerone", "Percell", "Rasaan", "Rashaun", "Everol", "Terryl", "Aiesha", "Lashelle",
-                                 "Temeka", "Tameisha", "Teretha", "Latonya", "Shanise", "Sharise", "Tashika", "Lashandra", "Shavonn", "Tawanda"]
-
-        attributes_1 = ["caress", "freedom", "health", "love", "peace", "cheer", "friend", "heaven", "loyal", "pleasure",
-                                "diamond", "gentle", "honest", "lucky", "rainbow", "diploma", "gift", "honor", "miracle", "sunrise",
-                                "family", "happy", "laughter", "paradise", "vacation"]
-
+        targets_2 = [
+            "Alonzo", "Jamel", "Theo", "Alphonse", "Jerome", "Leroy", "Torrance", "Darnell", "Lamar", "Lionel",
+            "Tyree", "Deion", "Lamont", "Malik", "Terrence", "Tyrone",    "Lavon", "Marcellus", "Wardell", "Nichelle",
+            "Shereen", "Ebony", "Latisha", "Shaniqua", "Jasmine", "Tanisha", "Tia", "Lakisha", "Latoya", "Yolanda",
+            "Malika", "Yvette", "Lerone", "Percell", "Rasaan", "Rashaun", "Everol", "Terryl", "Aiesha", "Lashelle",
+            "Temeka", "Tameisha", "Teretha", "Latonya", "Shanise", "Sharise", "Tashika", "Lashandra", "Shavonn",
+            "Tawanda"
+        ]
+        attributes_1 = [
+            "caress", "freedom", "health", "love", "peace", "cheer", "friend", "heaven", "loyal", "pleasure",
+            "diamond", "gentle", "honest", "lucky", "rainbow", "diploma", "gift", "honor", "miracle", "sunrise",
+            "family", "happy", "laughter", "paradise", "vacation"
+        ]
         # same as before but agony and prison are replaced with bomb and evil
-        attributes_2 = ["abuse", "crash", "filth", "murder", "sickness", "accident", "death", "grief", "poison", "stink",
-                                    "assault", "disaster", "hatred", "pollute", "tragedy", "divorce", "jail", "poverty", "ugly", "cancer",
-                                    "kill", "rotten",
-                                    "vomit", "bomb", "evil"]
-
+        attributes_2 = [
+            "abuse", "crash", "filth", "murder", "sickness", "accident", "death", "grief", "poison", "stink",
+            "assault", "disaster", "hatred", "pollute", "tragedy", "divorce", "jail", "poverty", "ugly", "cancer",
+            "kill", "rotten", "vomit", "bomb", "evil"
+        ]
         return targets_1, targets_2, attributes_1, attributes_2
-
 
     # again: african american names vs. european american names and pleasant vs unpleasant but with different names
-    def weat_4(self):
+    @staticmethod
+    def weat_4():
         # excluded as in the original paper: Jay, Kristen, (here only excluded in the glove experiments)
-        targets_1 = ["Brad", "Brendan", "Geoffrey", "Greg", "Brett",    "Matthew", "Neil", "Todd", "Allison", "Anne",
-                                 "Carrie", "Emily", "Jill", "Laurie",    "Meredith", "Sarah", "Jay", "Kristen"]
-
+        targets_1 = [
+            "Brad", "Brendan", "Geoffrey", "Greg", "Brett", "Matthew", "Neil", "Todd", "Allison", "Anne",
+            "Carrie", "Emily", "Jill", "Laurie",    "Meredith", "Sarah", "Jay", "Kristen"
+        ]
         # excluded in GloVe experiments:    Tremayne, Latonya,
-        targets_2 = ["Darnell", "Hakim", "Jermaine", "Kareem", "Jamal", "Leroy", "Rasheed", "Tyrone", "Aisha", "Ebony",
-                                 "Keisha", "Kenya",    "Lakisha", "Latoya", "Tamika", "Tanisha", "Tremayne", "Latonya"]
-
-        attributes_1 = ["caress", "freedom", "health", "love", "peace", "cheer", "friend", "heaven", "loyal", "pleasure",
-                                        "diamond", "gentle", "honest", "lucky", "rainbow", "diploma", "gift", "honor", "miracle", "sunrise",
-                                        "family", "happy", "laughter", "paradise", "vacation"]
-
+        targets_2 = [
+            "Darnell", "Hakim", "Jermaine", "Kareem", "Jamal", "Leroy", "Rasheed", "Tyrone", "Aisha", "Ebony",
+            "Keisha", "Kenya",    "Lakisha", "Latoya", "Tamika", "Tanisha", "Tremayne", "Latonya"
+        ]
+        attributes_1 = [
+            "caress", "freedom", "health", "love", "peace", "cheer", "friend", "heaven", "loyal", "pleasure",
+            "diamond", "gentle", "honest", "lucky", "rainbow", "diploma", "gift", "honor", "miracle", "sunrise",
+            "family", "happy", "laughter", "paradise", "vacation"
+        ]
         # same as before but agony and prison are replaced with bomb and evil
-        attributes_2 = ["abuse", "crash", "filth", "murder", "sickness", "accident", "death", "grief", "poison", "stink",
-                                        "assault", "disaster", "hatred", "pollute", "tragedy", "divorce", "jail", "poverty", "ugly",
-                                        "cancer",
-                                        "kill", "rotten",
-                                        "vomit", "bomb", "evil"]
-
+        attributes_2 = [
+            "abuse", "crash", "filth", "murder", "sickness", "accident", "death", "grief", "poison", "stink",
+            "assault", "disaster", "hatred", "pollute", "tragedy", "divorce", "jail", "poverty", "ugly", "cancer",
+            "kill", "rotten", "vomit", "bomb", "evil"
+        ]
         return targets_1, targets_2, attributes_1, attributes_2
-
 
     # again african american vs european american names, but with different attributes
-    def weat_5(self):
+    @staticmethod
+    def weat_5():
         # excluded as in the original paper: Jay, Kristen, (here only excluded in the glove experiments)
-        targets_1 = ["Brad", "Brendan", "Geoffrey", "Greg", "Brett",    "Matthew", "Neil", "Todd", "Allison", "Anne",
-                                 "Carrie", "Emily", "Jill", "Laurie",    "Meredith", "Sarah", "Jay", "Kristen"]
-
+        targets_1 = [
+            "Brad", "Brendan", "Geoffrey", "Greg", "Brett", "Matthew", "Neil", "Todd", "Allison", "Anne",
+            "Carrie", "Emily", "Jill", "Laurie",    "Meredith", "Sarah", "Jay", "Kristen"
+        ]
         # excluded in GloVe experiments:    Tremayne, Latonya,
-        targets_2 = ["Darnell", "Hakim", "Jermaine", "Kareem", "Jamal", "Leroy", "Rasheed", "Tyrone", "Aisha", "Ebony",
-                                 "Keisha", "Kenya",    "Lakisha", "Latoya", "Tamika", "Tanisha", "Tremayne", "Latonya"]
-
+        targets_2 = [
+            "Darnell", "Hakim", "Jermaine", "Kareem", "Jamal", "Leroy", "Rasheed", "Tyrone", "Aisha", "Ebony",
+            "Keisha", "Kenya",    "Lakisha", "Latoya", "Tamika", "Tanisha", "Tremayne", "Latonya"
+        ]
         attributes_1 = ["joy", "love", "peace", "wonderful", "pleasure", "friend", "laughter", "happy"]
-
         attributes_2 = ["agony", "terrible", "horrible", "nasty", "evil", "war", "awful", "failure"]
-
         return targets_1, targets_2, attributes_1, attributes_2
 
-
     # sex- career
-    def weat_6(self):
+    @staticmethod
+    def weat_6():
         targets_1 = ["John", "Paul", "Mike", "Kevin", "Steve", "Greg", "Jeff", "Bill"]
         targets_2 = ["Amy", "Joan", "Lisa", "Sarah", "Diana", "Kate", "Ann", "Donna"]
-        attributes_1 = ["executive", "management", "professional", "corporation", "salary", "office", "business", "career"]
+        attributes_1 = ["executive", "management", "professional", "corporation", "salary", "office", "business",
+                        "career"]
         attributes_2 = ["home", "parents", "children", "family", "cousins", "marriage", "wedding", "relatives"]
 
         return targets_1, targets_2, attributes_1, attributes_2
 
-
     # sex - math
-    def weat_7(self):
+    @staticmethod
+    def weat_7():
         targets_1 = ["math", "algebra", "geometry", "calculus", "equations", "computation", "numbers", "addition"]
         targets_2 = ["poetry", "art", "dance", "literature", "novel", "symphony", "drama", "sculpture"]
         attributes_1 = ["male", "man", "boy", "brother", "he", "him", "his", "son"]
         attributes_2 = ["female", "woman", "girl", "sister", "she", "her", "hers", "daughter"]
         return targets_1, targets_2, attributes_1, attributes_2
 
-
     # sex - science
-    def weat_8(self):
+    @staticmethod
+    def weat_8():
         targets_1 = ["science", "technology", "physics", "chemistry", "Einstein", "NASA", "experiment", "astronomy"]
         targets_2 = ["poetry", "art", "Shakespeare", "dance", "literature", "novel", "symphony", "drama"]
         attributes_1 = ["brother", "father", "uncle", "grandfather", "son", "he", "his", "him"]
         attributes_2 = ["sister", "mother", "aunt", "grandmother", "daughter", "she", "hers", "her"]
         return targets_1, targets_2, attributes_1, attributes_2
 
-
     # desease - uncontrollability
-    def weat_9(self):
+    @staticmethod
+    def weat_9():
         targets_1 = ["sad", "hopeless", "gloomy", "tearful", "miserable", "depressed"]
         targets_2 = ["sick", "illness", "influenza", "disease", "virus", "cancer"]
         # in w2v experiments, the've replaced short-term with short
         attributes_1 = ["impermanent", "unstable", "variable", "fleeting", "short-term", "brief", "occasional"]
         attributes_2 = ["stable", "always", "constant", "persistent", "chronic", "prolonged", "forever"]
-
         return targets_1, targets_2, attributes_1, attributes_2
 
-
     # old - pleasant
-    def weat_10(self):
+    @staticmethod
+    def weat_10():
         targets_1 = ["Tiffany", "Michelle", "Cindy", "Kristy", "Brad", "Eric", "Joey", "Billy"]
         targets_2 = ["Ethel", "Bernice", "Gertrude", "Agnes", "Cecil", "Wilbert", "Mortimer", "Edgar"]
         attributes_1 = ["joy", "love", "peace", "wonderful", "pleasure", "friend", "laughter", "happy"]
         attributes_2 = ["agony", "terrible", "horrible", "nasty", "evil", "war", "awful", "failure"]
-
         return targets_1, targets_2, attributes_1, attributes_2
-    # missing from the original IAT: arab-muslim
 
+    # missing from the original IAT: arab-muslim
     def load_names(self, fpath):
         title_lines = ['Male:', 'Female:']
         names = []
@@ -308,11 +326,20 @@ class XWEAT(object):
         with open(fpath) as f:
             for line in f:
                 line = line.strip('\n')
+                if line.startswith('source:') or line == 'Male:':
+                    continue
                 names.append(line)
                 if line == 'Female:':
                     return names
 
+    def load_random_subset_of_names(self, fpath):
+        raise NotImplementedError
 
+    def load_random_subset_of_male_names(self, fpath):
+        raise NotImplementedError
+
+    def load_random_subset_of_female_names(self, fpath):
+        raise NotImplementedError
 
     def load_word_list(self, fpath):
         with open(fpath) as f:
@@ -320,247 +347,455 @@ class XWEAT(object):
 
     # german names vs arabic names and pleasant vs unpleasant
     def weat_11(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/arabic_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/arabic_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs french names and pleasant vs unpleasant
     def weat_12(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/french_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/french_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs hebrew names and pleasant vs unpleasant
     def weat_13(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/hebrew_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/hebrew_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs kosovo names and pleasant vs unpleasant
     def weat_14(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/kosovo_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/kosovo_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs macedonian names and pleasant vs unpleasant
     def weat_15(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/macedonian_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/macedonian_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs polish names and pleasant vs unpleasant
     def weat_16(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/polish_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/polish_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs portuguese names and pleasant vs unpleasant
     def weat_17(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/portuguese_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/portuguese_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs romanian names and pleasant vs unpleasant
     def weat_18(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/romanian_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/romanian_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs serbish names and pleasant vs unpleasant
     def weat_19(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/serbish_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/serbish_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs spanish names and pleasant vs unpleasant
     def weat_20(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/spanish_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/spanish_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs swiss names and pleasant vs unpleasant
     def weat_21(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/swiss_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/swiss_names.txt')
+        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    # swiss names vs austrian names and pleasant vs unpleasant
+    def weat_22(self):
+        targets_1 = self.loading_func('../data/word_lists/swiss_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/austrian_names.txt')
+        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    # austrian names vs german names and pleasant vs unpleasant
+    def weat_23(self):
+        targets_1 = self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/german_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs turkish names and pleasant vs unpleasant
-    def weat_22(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/turkish_names.txt')
+    def weat_24(self):
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/turkish_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
-    # german names vs union of various eastern names and pleasant vs unpleasant
-    def weat_23(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        turkish = self.load_male_names('../data/word_lists/turkish_names.txt')
-        serbish = self.load_male_names('../data/word_lists/serbish_names.txt')
-        romanian = self.load_male_names('../data/word_lists/romanian_names.txt')
-        polish = self.load_male_names('../data/word_lists/polish_names.txt')
-        macedonian = self.load_male_names('../data/word_lists/macedonian_names.txt')
-        kosovo = self.load_male_names('../data/word_lists/kosovo_names.txt')
-        arabic = self.load_male_names('../data/word_lists/arabic_names.txt')
-        targets_2 = turkish + serbish + romanian + polish + macedonian + kosovo + arabic
+    def weat_west_european_pleasant_unpleasant(self):
+        german = self.loading_func('../data/word_lists/german_names.txt')
+        swiss = self.loading_func('../data/word_lists/swiss_names.txt')
+        austrian = self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_1 = german + swiss + austrian
+        french = self.loading_func('../data/word_lists/french_names.txt')
+        italian = self.loading_func('../data/word_lists/italian_names.txt')
+        portuguese = self.loading_func('../data/word_lists/portuguese_names.txt')
+        spanish = self.loading_func('../data/word_lists/spanish_names.txt')
+        targets_2 = french + italian + portuguese + spanish
+        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    def weat_east_european_pleasant_unpleasant(self):
+        german = self.loading_func('../data/word_lists/german_names.txt')
+        swiss = self.loading_func('../data/word_lists/swiss_names.txt')
+        austrian = self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_1 = german + swiss + austrian
+        serbish = self.loading_func('../data/word_lists/serbish_names.txt')
+        romanian = self.loading_func('../data/word_lists/romanian_names.txt')
+        polish = self.loading_func('../data/word_lists/polish_names.txt')
+        macedonian = self.loading_func('../data/word_lists/macedonian_names.txt')
+        kosovo = self.loading_func('../data/word_lists/kosovo_names.txt')
+        bosnian = self.loading_func('../data/word_lists/bosnian_names.txt')
+        croatian = self.loading_func('../data/word_lists/croatian_names.txt')
+        hungarian = self.loading_func('../data/word_lists/hungarian_names.txt')
+        slovak = self.loading_func('../data/word_lists/slovak_names.txt')
+        targets_2 = serbish + romanian + polish + macedonian + kosovo + bosnian + croatian + hungarian + slovak
+        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    def weat_middle_eastern_pleasant_unpleasant(self):
+        german = self.loading_func('../data/word_lists/german_names.txt')
+        swiss = self.loading_func('../data/word_lists/swiss_names.txt')
+        austrian = self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_1 = german + swiss + austrian
+        afghani = self.loading_func('../data/word_lists/afghani_names.txt')
+        syrian = self.loading_func('../data/word_lists/syrian_names.txt')
+        turkish = self.loading_func('../data/word_lists/turkish_names.txt')
+        # arabic = self.loading_func('../data/word_lists/arabic_names.txt')
+        targets_2 = afghani + syrian + turkish
         attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
         attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs union of various eastern names and career vs crime
-    def weat_24(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/turkish_names.txt')
+    def weat_26(self):
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/turkish_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_25(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/serbish_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
-        return targets_1, targets_2, attributes_1, attributes_2
-
-    def weat_26(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/romanian_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/serbish_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_27(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/polish_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/romanian_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_28(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/macedonian_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/polish_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_29(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/kosovo_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/macedonian_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_30(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/arabic_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/kosovo_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_31(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/french_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/arabic_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_32(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/spanish_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/french_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_33(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/portuguese_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/spanish_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_34(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        turkish = self.load_male_names('../data/word_lists/turkish_names.txt')
-        serbish = self.load_male_names('../data/word_lists/serbish_names.txt')
-        romanian = self.load_male_names('../data/word_lists/romanian_names.txt')
-        polish = self.load_male_names('../data/word_lists/polish_names.txt')
-        macedonian = self.load_male_names('../data/word_lists/macedonian_names.txt')
-        kosovo = self.load_male_names('../data/word_lists/kosovo_names.txt')
-        arabic = self.load_male_names('../data/word_lists/arabic_names.txt')
-        targets_2 = turkish + serbish + romanian + polish + macedonian + kosovo + arabic
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/portuguese_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_35(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt') + self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/hebrew_names.txt')
+    def weat_east_european_career_crime(self):
+        german = self.loading_func('../data/word_lists/german_names.txt')
+        swiss = self.loading_func('../data/word_lists/swiss_names.txt')
+        austrian = self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_1 = german + swiss + austrian
+
+        serbish = self.loading_func('../data/word_lists/serbish_names.txt')
+        romanian = self.loading_func('../data/word_lists/romanian_names.txt')
+        polish = self.loading_func('../data/word_lists/polish_names.txt')
+        macedonian = self.loading_func('../data/word_lists/macedonian_names.txt')
+        kosovo = self.loading_func('../data/word_lists/kosovo_names.txt')
+        bosnian = self.loading_func('../data/word_lists/bosnian_names.txt')
+        croatian = self.loading_func('../data/word_lists/croatian_names.txt')
+        hungarian = self.loading_func('../data/word_lists/hungarian_names.txt')
+        slovak = self.loading_func('../data/word_lists/slovak_names.txt')
+        targets_2 = serbish + romanian + polish + macedonian + kosovo + bosnian + croatian + hungarian + slovak
+
+        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    def weat_middle_eastern_career_crime(self):
+        german = self.loading_func('../data/word_lists/german_names.txt')
+        swiss = self.loading_func('../data/word_lists/swiss_names.txt')
+        austrian = self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_1 = german + swiss + austrian
+
+        afghani = self.loading_func('../data/word_lists/afghani_names.txt')
+        syrian = self.loading_func('../data/word_lists/syrian_names.txt')
+        turkish = self.loading_func('../data/word_lists/turkish_names.txt')
+        # arabic = self.loading_func('../data/word_lists/arabic_names.txt')
+        targets_2 = afghani + syrian + turkish
+
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_36(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt')
-        targets_2 = self.load_male_names('../data/word_lists/swiss_names.txt')
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
+                    self.loading_func('../data/word_lists/swiss_names.txt') + \
+                    self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/hebrew_names.txt')
         attributes_1 = self.load_word_list('../data/word_lists/career.txt')
         attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
         return targets_1, targets_2, attributes_1, attributes_2
 
+    # german names vs swiss names and career vs crime
+    def weat_37(self):
+        targets_1 = self.loading_func('../data/word_lists/german_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/swiss_names.txt')
+        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    # swiss names vs austrian names and career vs crime
+    def weat_38(self):
+        targets_1 = self.loading_func('../data/word_lists/swiss_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/austrian_names.txt')
+        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    # austrian names vs german names and career vs crime
+    def weat_39(self):
+        targets_1 = self.loading_func('../data/word_lists/austrian_names.txt')
+        targets_2 = self.loading_func('../data/word_lists/german_names.txt')
+        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    # --- gender tests ---
+    def weat_male_german_female_german_career_family(self):
+        targets_1 = self.load_male_names('../data/word_lists/german_names.txt')
+        targets_2 = self.load_female_names('../data/word_lists/german_names.txt')
+        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/family.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    def weat_male_swiss_female_swiss_career_family(self):
+        targets_1 = self.load_male_names('../data/word_lists/swiss_names.txt')
+        targets_2 = self.load_female_names('../data/word_lists/swiss_names.txt')
+        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/family.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    def weat_male_austrian_female_austrian_career_family(self):
+        targets_1 = self.load_male_names('../data/word_lists/austrian_names.txt')
+        targets_2 = self.load_female_names('../data/word_lists/austrian_names.txt')
+        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/family.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    def weat_male_germanic_female_germanic_career_family(self):
+        mgerman = self.load_male_names('../data/word_lists/german_names.txt')
+        mswiss = self.load_male_names('../data/word_lists/swiss_names.txt')
+        maustrian = self.load_male_names('../data/word_lists/austrian_names.txt')
+        targets_1 = mgerman + mswiss + maustrian
+        fgerman = self.loading_func('../data/word_lists/german_names.txt')
+        fswiss = self.load_female_names('../data/word_lists/swiss_names.txt')
+        faustrian = self.load_female_names('../data/word_lists/austrian_names.txt')
+        targets_2 = fgerman + fswiss + faustrian
+        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/family.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    # gender tests for eastern european names
+    def weat_male_eastern_eu_female_eastern_eu_career_family(self):
+        mserbish = self.load_male_names('../data/word_lists/serbish_names.txt')
+        mromanian = self.load_male_names('../data/word_lists/romanian_names.txt')
+        mpolish = self.load_male_names('../data/word_lists/polish_names.txt')
+        mmacedonian = self.load_male_names('../data/word_lists/macedonian_names.txt')
+        mkosovo = self.load_male_names('../data/word_lists/kosovo_names.txt')
+        mbosnian = self.load_male_names('../data/word_lists/bosnian_names.txt')
+        mcroatian = self.load_male_names('../data/word_lists/croatian_names.txt')
+        mhungarian = self.load_male_names('../data/word_lists/hungarian_names.txt')
+        mslovak = self.load_male_names('../data/word_lists/slovak_names.txt')
+        targets_1 = mserbish + mromanian + mpolish + mmacedonian + mkosovo + mbosnian + mcroatian + mcroatian + \
+                    mhungarian + mslovak
+        fserbish = self.load_female_names('../data/word_lists/serbish_names.txt')
+        fromanian = self.load_female_names('../data/word_lists/romanian_names.txt')
+        fpolish = self.load_female_names('../data/word_lists/polish_names.txt')
+        fmacedonian = self.load_female_names('../data/word_lists/macedonian_names.txt')
+        fkosovo = self.load_female_names('../data/word_lists/kosovo_names.txt')
+        fbosnian = self.load_female_names('../data/word_lists/bosnian_names.txt')
+        fcroatian = self.load_female_names('../data/word_lists/croatian_names.txt')
+        fhungarian = self.load_female_names('../data/word_lists/hungarian_names.txt')
+        fslovak = self.load_female_names('../data/word_lists/slovak_names.txt')
+        targets_2 = fserbish + fromanian + fpolish + fmacedonian + fkosovo + fbosnian + fcroatian + fhungarian + fslovak
+        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
+        attributes_2 = self.load_word_list('../data/word_lists/family.txt')
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    # gender tests for western european names
+    # gender tests for middle eastern names
+
+    # tests for anti-semitism
+    def weat_german_jewish_pleasant_unpleasant(self):
+        pass
+
+    def weat_german_jewish_career_crime(self):
+        pass
+
+    def weat_german_jewish_conspiracy(self):
+        pass
+
+    def weat_german_jewish_greed_stereotype(self):
+        pass
 
     # occupations
     def wefat_1(self):
         # occupations derived from th bureau of labor statistics
-        targets = ["technician", "accountant", "supervisor", "engineer", "worker", "educator", "clerk", "counselor", "inspector",
-                            "mechanic", "manager", "therapist", "administrator", "salesperson", "receptionist", "librarian", "advisor", "pharmacist",
-                            "janitor", "psychologist", "physician", "carpenter", "nurse", "investigator", "bartender", "specialist", "electrician",
-                            "officer", "pathologist", "teacher", "lawyer", "planner", "practitioner", "plumber", "instructor",
-                            "surgeon", "veterinarian", "paramedic",
-                            "examiner", "chemist", "machinist", "appraiser", "nutritionist", "architect", "hairdresser", "baker",
-                            "programmer", "paralegal", "hygienist", "scientist"]
-
+        targets = [
+            "technician", "accountant", "supervisor", "engineer", "worker", "educator", "clerk", "counselor",
+            "inspector", "mechanic", "manager", "therapist", "administrator", "salesperson", "receptionist",
+            "librarian", "advisor", "pharmacist", "janitor", "psychologist", "physician", "carpenter", "nurse",
+            "investigator", "bartender", "specialist", "electrician", "officer", "pathologist", "teacher", "lawyer",
+            "planner", "practitioner", "plumber", "instructor", "surgeon", "veterinarian", "paramedic", "examiner",
+            "chemist", "machinist", "appraiser", "nutritionist", "architect", "hairdresser", "baker", "programmer",
+            "paralegal", "hygienist", "scientist"
+        ]
         attributes_1 = ["male", "man", "boy", "brother", "he", "him", "his", "son"]
         attributes_2 = ["female", "woman", "girl", "sister", "she", "her", "hers", "daughter"]
         return targets, attributes_1, attributes_2
-
 
     # androgynous names
     def wefat_2(self):
-        targets = ["Kelly", "Tracy", "Jamie", "Jackie", "Jesse", "Courtney", "Lynn", "Taylor", "Leslie", "Shannon",
-                            "Stacey", "Jessie", "Shawn", "Stacy", "Casey", "Bobby", "Terry", "Lee", "Ashley", "Eddie", "Chris", "Jody", "Pat",
-                            "Carey", "Willie", "Morgan", "Robbie", "Joan", "Alexis", "Kris", "Frankie", "Bobbie", "Dale", "Robin", "Billie",
-                            "Adrian", "Kim", "Jaime", "Jean", "Francis", "Marion", "Dana", "Rene", "Johnnie", "Jordan", "Carmen", "Ollie",
-                            "Dominique", "Jimmie", "Shelby"]
-
+        targets = [
+            "Kelly", "Tracy", "Jamie", "Jackie", "Jesse", "Courtney", "Lynn", "Taylor", "Leslie", "Shannon",
+            "Stacey", "Jessie", "Shawn", "Stacy", "Casey", "Bobby", "Terry", "Lee", "Ashley", "Eddie", "Chris", "Jody",
+            "Pat", "Carey", "Willie", "Morgan", "Robbie", "Joan", "Alexis", "Kris", "Frankie", "Bobbie", "Dale",
+            "Robin", "Billie", "Adrian", "Kim", "Jaime", "Jean", "Francis", "Marion", "Dana", "Rene", "Johnnie",
+            "Jordan", "Carmen", "Ollie", "Dominique", "Jimmie", "Shelby"
+        ]
         attributes_1 = ["male", "man", "boy", "brother", "he", "him", "his", "son"]
         attributes_2 = ["female", "woman", "girl", "sister", "she", "her", "hers", "daughter"]
         return targets, attributes_1, attributes_2
 
-
     def similarity_precomputed_sims(self, w1, w2, type="cosine"):
         return self.similarities[w1, w2]
-
 
     def word_association_with_attribute_precomputed_sims(self, w, A, B):
         return np.mean([self.similarity_precomputed_sims(w, a) for a in A]) - np.mean([self.similarity_precomputed_sims(w, b) for b in B])
@@ -570,13 +805,11 @@ class XWEAT(object):
         return np.sum([self.word_association_with_attribute_precomputed_sims(t1, A1, A2) for t1 in T1]) \
                      - np.sum([self.word_association_with_attribute_precomputed_sims(t2, A1, A2) for t2 in T2])
 
-
     def weat_effect_size_precomputed_sims(self, T1, T2, A1, A2):
         return (
                          np.mean([self.word_association_with_attribute_precomputed_sims(t1, A1, A2) for t1 in T1]) -
                          np.mean([self.word_association_with_attribute_precomputed_sims(t2, A1, A2) for t2 in T2])
                      ) / np.std([self.word_association_with_attribute_precomputed_sims(w, A1, A2) for w in T1 + T2])
-
 
     def _random_permutation(self, iterable, r=None):
         pool = tuple(iterable)
@@ -588,7 +821,8 @@ class XWEAT(object):
         size_of_permutation = min(len(T1), len(T2))
         T1_T2 = T1 + T2
         observed_test_stats_over_permutations = []
-        total_possible_permutations = math.factorial(len(T1_T2)) / math.factorial(size_of_permutation) / math.factorial((len(T1_T2)-size_of_permutation))
+        total_possible_permutations = math.factorial(len(T1_T2)) / math.factorial(size_of_permutation) / \
+                                      math.factorial((len(T1_T2)-size_of_permutation))
         logging.info("Number of possible permutations: %d", total_possible_permutations)
         if not sample or sample >= total_possible_permutations:
             permutations = combinations(T1_T2, size_of_permutation)
@@ -607,7 +841,6 @@ class XWEAT(object):
         is_over = np.array([o > unperturbed for o in observed_test_stats_over_permutations])
         return is_over.sum() / is_over.size
 
-
     def weat_stats_precomputed_sims(self, T1, T2, A1, A2, sample_p=None):
         test_statistic = self.differential_association_precomputed_sims(T1, T2, A1, A2)
         effect_size = self.weat_effect_size_precomputed_sims(T1, T2, A1, A2)
@@ -619,15 +852,15 @@ class XWEAT(object):
         >>> weat = XWEAT(None); weat._create_vocab()
         :return: all
         """
-        all = []
+        all_sets = []
         for i in range(1, 10):
             t1, t2, a1, a2 = getattr(self, "weat_" + str(i))()
-            all = all + t1 + t2 + a1 + a2
+            all_sets = all_sets + t1 + t2 + a1 + a2
         for i in range(1, 2):
             t1, a1, a2 = getattr(self, "wefat_" + str(i))()
-            all = all + t1 + a1 + a2
-        all = set(all)
-        return all
+            all_sets = all_sets + t1 + a1 + a2
+        all_sets = set(all_sets)
+        return all_sets
 
     def _output_vocab(self, path="./data/vocab_en.txt"):
         """
@@ -640,8 +873,8 @@ class XWEAT(object):
                 f.write("\n")
             f.close()
 
-
-    def run_test_precomputed_sims(self, target_1, target_2, attributes_1, attributes_2, sample_p=None, similarity_type="cosine"):
+    def run_test_precomputed_sims(self, target_1, target_2, attributes_1, attributes_2, sample_p=None,
+                                  similarity_type="cosine"):
         """Run the WEAT test for differential association between two
         sets of target words and two sets of attributes.
 
@@ -673,13 +906,14 @@ class XWEAT(object):
         while len(A2) < len(A1):
             logging.info("Popped A1 %d", A1[-1])
             A1.pop(-1)
-        assert len(T1)==len(T2)
+        assert len(T1) == len(T2)
         assert len(A1) == len(A2)
         self._build_embedding_matrix()
         self._init_similarities(similarity_type)
         return self.weat_stats_precomputed_sims(T1, T2, A1, A2, sample_p)
 
-    def _parse_translations(self, path="./data/vocab_en_de.csv", new_path="./data/vocab_dict_en_de.p", is_russian=False):
+    def _parse_translations(self, path="./data/vocab_en_de.csv", new_path="./data/vocab_dict_en_de.p",
+                            is_russian=False):
         """
         :param path: path of the csv file edited by our translators
         :param new_path: path of the clean dict to save
@@ -702,7 +936,8 @@ class XWEAT(object):
                     else:
                         other_m = parts[1].strip()
                         other_f = None
-                        if len(parts) > 2 and parts[2] != "\n" and parts[2] != "\r\n" and parts[2] != "\r" and parts[2] != '':
+                        if len(parts) > 2 and parts[2] != "\n" and parts[2] != "\r\n" and parts[2] != "\r" and \
+                                parts[2] != '':
                             other_f = parts[2].strip()
                         translation_dict[en] = (other_m, other_f)
             pickle.dump(translation_dict, open(new_path, "wb"))
@@ -768,7 +1003,6 @@ def translate(translation_dict, terms):
     translation = list(set(translation))
     return translation
 
-
 def compute_oov_percentage():
     """
     >>> compute_oov_percentage()
@@ -780,15 +1014,20 @@ def compute_oov_percentage():
             targets_1, targets_2, attributes_1, attributes_2 = XWEAT().__getattribute__("weat_" + str(test))()
             vocab = targets_1 + targets_2 + attributes_1 + attributes_2
             vocab = [t.lower() for t in vocab]
-            #f.write("English vocab: %s \n" % str(vocab))
+            # f.write("English vocab: %s \n" % str(vocab))
             for language in ["en", "es", "de", "tr", "ru", "hr", "it"]:
                 if language != "en":
-                    #f.write("Translating terms from en to %s\n" % language)
+                    # f.write("Translating terms from en to %s\n" % language)
                     translation_dict = load_vocab_goran("./data/vocab_dict_en_" + language + ".p")
                     vocab_translated = translate(translation_dict, vocab)
                     vocab_translated = [t.lower() for t in vocab_translated]
-                    #f.write("Translated terms %s\n" % str(vocab))
-                embd_dict = load_embedding_dict(vocab_path="/work/gglavas/data/word_embs/yacle/fasttext/200K/npformat/ft.wiki."+language+".300.vocab", vector_path="/work/gglavas/data/word_embs/yacle/fasttext/200K/npformat/ft.wiki."+language+".300.vectors")
+                    # f.write("Translated terms %s\n" % str(vocab))
+                embd_dict = load_embedding_dict(
+                    vocab_path="/work/gglavas/data/word_embs/yacle/fasttext/200K/npformat/"
+                               "ft.wiki."+language+".300.vocab",
+                    vector_path="/work/gglavas/data/word_embs/yacle/fasttext/200K/npformat/"
+                                "ft.wiki."+language+".300.vectors"
+                )
                 ins=[]
                 not_ins=[]
                 if language != "en":
@@ -826,15 +1065,17 @@ def main():
     parser.add_argument("--embedding_vectors", type=str, help="Vectors of the embeddings")
     parser.add_argument("--use_glove", type=boolean_string, default=False, help="Use glove")
     parser.add_argument("--postspec", type=boolean_string, default=False, help="Use postspecialized fasttext")
-    parser.add_argument("--is_vec_format", type=boolean_string, default=False, help="Whether embeddings are in vec format")
+    parser.add_argument("--is_vec_format", type=boolean_string, default=False,
+                        help="Whether embeddings are in vec format")
     parser.add_argument("--embeddings", type=str, help="Vectors and vocab of the embeddings")
     parser.add_argument("--lang", type=str, default="en", help="Language to test")
+    parser.add_argument("--gender", type=str, default="both", help="Gender settings: 'both', 'female', 'male'")
     args = parser.parse_args()
 
     start = time()
     logging.basicConfig(level=logging.INFO)
     logging.info("XWEAT started")
-    weat = XWEAT()
+    weat = XWEAT(gender=args.gender)
     if args.test_number == 1:
         targets_1, targets_2, attributes_1, attributes_2 = weat.weat_1()
     elif args.test_number == 2:
@@ -934,12 +1175,14 @@ def main():
         embd_dict = load_embedding_dict(embeddings_path=args.embeddings, glove=False)
         logging.info(f"Loading of embeddings took {round((time() - t) / 60, 2) }")
     else:
-        embd_dict = load_embedding_dict(vocab_path=args.embedding_vocab, vector_path=args.embedding_vectors, glove=False)
+        embd_dict = load_embedding_dict(vocab_path=args.embedding_vocab, vector_path=args.embedding_vectors,
+                                        glove=False)
     weat.set_embd_dict(embd_dict)
 
     logging.info("Embeddings loaded")
     logging.info("Running test")
-    result = weat.run_test_precomputed_sims(targets_1, targets_2, attributes_1, attributes_2, args.permutation_number, args.similarity_type)
+    result = weat.run_test_precomputed_sims(targets_1, targets_2, attributes_1, attributes_2, args.permutation_number,
+                                            args.similarity_type)
     logging.info(result)
     mode = 'a' if os.path.exists(args.output_file) else 'w'
     with codecs.open(args.output_file, mode, "utf8") as f:
