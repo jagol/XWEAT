@@ -23,11 +23,13 @@ class XWEAT(object):
     Credits: Basic implementation based on https://gist.github.com/SandyRogers/e5c2e938502a75dcae25216e4fae2da5
     """
 
-    def __init__(self, gender):
+    def __init__(self, gender, word_list_dir):
+        self.gender = gender
+        self.word_list_dir = word_list_dir
+        self.wl_paths = self.get_paths(word_list_dir)
         self.embd_dict = None
         self.vocab = None
         self.embedding_matrix = None
-        self.gender = gender
         if self.gender == 'both':
             self.loading_func = self.load_names
         elif self.gender == 'female':
@@ -36,6 +38,14 @@ class XWEAT(object):
             self.loading_func = self.loading_func
         else:
             raise Exception('Gender option not known.')
+
+    def get_paths(self, word_list_dir):
+        """Create paths for all word list files."""
+        wl_paths = {}
+        for fname in os.listdir(word_list_dir):
+            key = fname.strip('.txt')
+            wl_paths[key] = os.path.join(word_list_dir, fname)
+        return wl_paths
 
     def set_embd_dict(self, embd_dict):
         self.embd_dict = embd_dict
@@ -164,24 +174,26 @@ class XWEAT(object):
 
     # Here they deleted the infrequent african american names, and the same
     # number randomly choosen from the european american names
-    @staticmethod
-    def weat_3():
+    def weat_3(self):
         # excluded in the original paper: Chip, Ian, Fred, Jed, Todd, Brandon, Wilbur, Sara, Amber,
         # Crystal, Meredith, Shannon, Donna,
         # Bobbie-Sue, Peggy, Sue-Ellen, Wendy
-        targets_1 = [
-            "Adam", "Harry", "Josh", "Roger", "Alan", "Frank", "Justin", "Ryan", "Andrew", "Jack", "Matthew", "Stephen",
-            "Brad", "Greg", "Paul", "Hank", "Jonathan", "Peter", "Amanda", "Courtney", "Heather", "Melanie", "Katie",
-            "Betsy", "Kristin", "Nancy", "Stephanie", "Ellen", "Lauren",    "Colleen", "Emily", "Megan", "Rachel",
-            "Chip", "Ian", "Fred", "Jed", "Todd", "Brandon", "Wilbur", "Sara", "Amber", "Crystal", "Meredith",
-            "Shannon", "Donna", "Bobbie-Sue", "Peggy", "Sue-Ellen", "Wendy"
-        ]
+        # targets_1 = [
+        #     "Adam", "Harry", "Josh", "Roger", "Alan", "Frank", "Justin", "Ryan", "Andrew", "Jack", "Matthew", "Stephen",
+        #     "Brad", "Greg", "Paul", "Hank", "Jonathan", "Peter", "Amanda", "Courtney", "Heather", "Melanie", "Katie",
+        #     "Betsy", "Kristin", "Nancy", "Stephanie", "Ellen", "Lauren",    "Colleen", "Emily", "Megan", "Rachel",
+        #     "Chip", "Ian", "Fred", "Jed", "Todd", "Brandon", "Wilbur", "Sara", "Amber", "Crystal", "Meredith",
+        #     "Shannon", "Donna", "Bobbie-Sue", "Peggy", "Sue-Ellen", "Wendy"
+        # ]
         # excluded: Lerone, Percell, Rasaan, Rashaun, Everol, Terryl, Aiesha, Lashelle, Temeka, Tameisha, Teretha,
         # Latonya, Shanise,
         # Sharise, Tashika, Lashandra, Shavonn, Tawanda,
+        targets_1 = self.load_names(self.wl_paths['german_names']) + \
+                    self.load_names(self.wl_paths['swiss_names']) + \
+                    self.load_names(self.wl_paths['austrian_names'])
         targets_2 = [
             "Alonzo", "Jamel", "Theo", "Alphonse", "Jerome", "Leroy", "Torrance", "Darnell", "Lamar", "Lionel",
-            "Tyree", "Deion", "Lamont", "Malik", "Terrence", "Tyrone",    "Lavon", "Marcellus", "Wardell", "Nichelle",
+            "Tyree", "Deion", "Lamont", "Malik", "Terrence", "Tyrone", "Lavon", "Marcellus", "Wardell", "Nichelle",
             "Shereen", "Ebony", "Latisha", "Shaniqua", "Jasmine", "Tanisha", "Tia", "Lakisha", "Latoya", "Yolanda",
             "Malika", "Yvette", "Lerone", "Percell", "Rasaan", "Rashaun", "Everol", "Terryl", "Aiesha", "Lashelle",
             "Temeka", "Tameisha", "Teretha", "Latonya", "Shanise", "Sharise", "Tashika", "Lashandra", "Shavonn",
@@ -201,13 +213,15 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # again: african american names vs. european american names and pleasant vs unpleasant but with different names
-    @staticmethod
-    def weat_4():
+    def weat_4(self):
         # excluded as in the original paper: Jay, Kristen, (here only excluded in the glove experiments)
-        targets_1 = [
-            "Brad", "Brendan", "Geoffrey", "Greg", "Brett", "Matthew", "Neil", "Todd", "Allison", "Anne",
-            "Carrie", "Emily", "Jill", "Laurie",    "Meredith", "Sarah", "Jay", "Kristen"
-        ]
+        # targets_1 = [
+        #     "Brad", "Brendan", "Geoffrey", "Greg", "Brett", "Matthew", "Neil", "Todd", "Allison", "Anne",
+        #     "Carrie", "Emily", "Jill", "Laurie",    "Meredith", "Sarah", "Jay", "Kristen"
+        # ]
+        targets_1 = self.load_names(self.wl_paths['german_names.txt']) + \
+                    self.load_names(self.wl_paths['swiss_names.txt']) + \
+                    self.load_names(self.wl_paths['austrian_names.txt'])
         # excluded in GloVe experiments:    Tremayne, Latonya,
         targets_2 = [
             "Darnell", "Hakim", "Jermaine", "Kareem", "Jamal", "Leroy", "Rasheed", "Tyrone", "Aisha", "Ebony",
@@ -227,17 +241,19 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # again african american vs european american names, but with different attributes
-    @staticmethod
-    def weat_5():
+    def weat_5(self):
         # excluded as in the original paper: Jay, Kristen, (here only excluded in the glove experiments)
-        targets_1 = [
-            "Brad", "Brendan", "Geoffrey", "Greg", "Brett", "Matthew", "Neil", "Todd", "Allison", "Anne",
-            "Carrie", "Emily", "Jill", "Laurie",    "Meredith", "Sarah", "Jay", "Kristen"
-        ]
+        # targets_1 = [
+        #     "Brad", "Brendan", "Geoffrey", "Greg", "Brett", "Matthew", "Neil", "Todd", "Allison", "Anne",
+        #     "Carrie", "Emily", "Jill", "Laurie",    "Meredith", "Sarah", "Jay", "Kristen"
+        # ]
+        targets_1 = self.load_names(self.wl_paths['german_names.txt']) + \
+                    self.load_names(self.wl_paths['swiss_names.txt']) + \
+                    self.load_names(self.wl_paths['austrian_names.txt'])
         # excluded in GloVe experiments:    Tremayne, Latonya,
         targets_2 = [
             "Darnell", "Hakim", "Jermaine", "Kareem", "Jamal", "Leroy", "Rasheed", "Tyrone", "Aisha", "Ebony",
-            "Keisha", "Kenya",    "Lakisha", "Latoya", "Tamika", "Tanisha", "Tremayne", "Latonya"
+            "Keisha", "Kenya", "Lakisha", "Latoya", "Tamika", "Tanisha", "Tremayne", "Latonya"
         ]
         attributes_1 = ["joy", "love", "peace", "wonderful", "pleasure", "friend", "laughter", "happy"]
         attributes_2 = ["agony", "terrible", "horrible", "nasty", "evil", "war", "awful", "failure"]
@@ -251,7 +267,6 @@ class XWEAT(object):
         attributes_1 = ["executive", "management", "professional", "corporation", "salary", "office", "business",
                         "career"]
         attributes_2 = ["home", "parents", "children", "family", "cousins", "marriage", "wedding", "relatives"]
-
         return targets_1, targets_2, attributes_1, attributes_2
 
     # sex - math
@@ -320,7 +335,6 @@ class XWEAT(object):
                     names.append(line)
             return names
 
-
     def load_male_names(self, fpath):
         names = []
         with open(fpath) as f:
@@ -347,406 +361,406 @@ class XWEAT(object):
 
     # german names vs arabic names and pleasant vs unpleasant
     def weat_11(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/arabic_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names'])
+        targets_2 = self.loading_func(self.wl_paths['arabic_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs french names and pleasant vs unpleasant
     def weat_12(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/french_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['french_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs hebrew names and pleasant vs unpleasant
     def weat_13(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/hebrew_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['hebrew_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs kosovo names and pleasant vs unpleasant
     def weat_14(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/kosovo_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['kosovo_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs macedonian names and pleasant vs unpleasant
     def weat_15(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/macedonian_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['macedonian_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs polish names and pleasant vs unpleasant
     def weat_16(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/polish_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['polish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs portuguese names and pleasant vs unpleasant
     def weat_17(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/portuguese_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['portuguese_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs romanian names and pleasant vs unpleasant
     def weat_18(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/romanian_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['romanian_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs serbish names and pleasant vs unpleasant
     def weat_19(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/serbish_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['serbish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs spanish names and pleasant vs unpleasant
     def weat_20(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/spanish_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['spanish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs swiss names and pleasant vs unpleasant
     def weat_21(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/swiss_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['swiss_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # swiss names vs austrian names and pleasant vs unpleasant
     def weat_22(self):
-        targets_1 = self.loading_func('../data/word_lists/swiss_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/austrian_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['swiss_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['austrian_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # austrian names vs german names and pleasant vs unpleasant
     def weat_23(self):
-        targets_1 = self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/german_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['german_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs turkish names and pleasant vs unpleasant
     def weat_24(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/turkish_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['turkish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_west_european_pleasant_unpleasant(self):
-        german = self.loading_func('../data/word_lists/german_names.txt')
-        swiss = self.loading_func('../data/word_lists/swiss_names.txt')
-        austrian = self.loading_func('../data/word_lists/austrian_names.txt')
+        german = self.loading_func(self.wl_paths['german_names.txt'])
+        swiss = self.loading_func(self.wl_paths['swiss_names.txt'])
+        austrian = self.loading_func(self.wl_paths['austrian_names.txt'])
         targets_1 = german + swiss + austrian
-        french = self.loading_func('../data/word_lists/french_names.txt')
-        italian = self.loading_func('../data/word_lists/italian_names.txt')
-        portuguese = self.loading_func('../data/word_lists/portuguese_names.txt')
-        spanish = self.loading_func('../data/word_lists/spanish_names.txt')
+        french = self.loading_func(self.wl_paths['french_names.txt'])
+        italian = self.loading_func(self.wl_paths['italian_names.txt'])
+        portuguese = self.loading_func(self.wl_paths['portuguese_names.txt'])
+        spanish = self.loading_func(self.wl_paths['spanish_names.txt'])
         targets_2 = french + italian + portuguese + spanish
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_east_european_pleasant_unpleasant(self):
-        german = self.loading_func('../data/word_lists/german_names.txt')
-        swiss = self.loading_func('../data/word_lists/swiss_names.txt')
-        austrian = self.loading_func('../data/word_lists/austrian_names.txt')
+        german = self.loading_func(self.wl_paths['german_names.txt'])
+        swiss = self.loading_func(self.wl_paths['swiss_names.txt'])
+        austrian = self.loading_func(self.wl_paths['austrian_names.txt'])
         targets_1 = german + swiss + austrian
-        serbish = self.loading_func('../data/word_lists/serbish_names.txt')
-        romanian = self.loading_func('../data/word_lists/romanian_names.txt')
-        polish = self.loading_func('../data/word_lists/polish_names.txt')
-        macedonian = self.loading_func('../data/word_lists/macedonian_names.txt')
-        kosovo = self.loading_func('../data/word_lists/kosovo_names.txt')
-        bosnian = self.loading_func('../data/word_lists/bosnian_names.txt')
-        croatian = self.loading_func('../data/word_lists/croatian_names.txt')
-        hungarian = self.loading_func('../data/word_lists/hungarian_names.txt')
-        slovak = self.loading_func('../data/word_lists/slovak_names.txt')
+        serbish = self.loading_func(self.wl_paths['serbish_names.txt'])
+        romanian = self.loading_func(self.wl_paths['romanian_names.txt'])
+        polish = self.loading_func(self.wl_paths['polish_names.txt'])
+        macedonian = self.loading_func(self.wl_paths['macedonian_names.txt'])
+        kosovo = self.loading_func(self.wl_paths['kosovo_names.txt'])
+        bosnian = self.loading_func(self.wl_paths['bosnian_names.txt'])
+        croatian = self.loading_func(self.wl_paths['croatian_names.txt'])
+        hungarian = self.loading_func(self.wl_paths['hungarian_names.txt'])
+        slovak = self.loading_func(self.wl_paths['slovak_names.txt'])
         targets_2 = serbish + romanian + polish + macedonian + kosovo + bosnian + croatian + hungarian + slovak
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_middle_eastern_pleasant_unpleasant(self):
-        german = self.loading_func('../data/word_lists/german_names.txt')
-        swiss = self.loading_func('../data/word_lists/swiss_names.txt')
-        austrian = self.loading_func('../data/word_lists/austrian_names.txt')
+        german = self.loading_func(self.wl_paths['german_names.txt'])
+        swiss = self.loading_func(self.wl_paths['swiss_names.txt'])
+        austrian = self.loading_func(self.wl_paths['austrian_names.txt'])
         targets_1 = german + swiss + austrian
-        afghani = self.loading_func('../data/word_lists/afghani_names.txt')
-        syrian = self.loading_func('../data/word_lists/syrian_names.txt')
-        turkish = self.loading_func('../data/word_lists/turkish_names.txt')
-        # arabic = self.loading_func('../data/word_lists/arabic_names.txt')
+        afghani = self.loading_func(self.wl_paths['afghani_names.txt'])
+        syrian = self.loading_func(self.wl_paths['syrian_names.txt'])
+        turkish = self.loading_func(self.wl_paths['turkish_names.txt'])
+        # arabic = self.loading_func(self.wl_paths['arabic_names.txt'])
         targets_2 = afghani + syrian + turkish
-        attributes_1 = self.load_word_list('../data/word_lists/pleasant.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/unpleasant.txt')
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs union of various eastern names and career vs crime
     def weat_26(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/turkish_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['turkish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_25(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/serbish_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['serbish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_27(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/romanian_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['romanian_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_28(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/polish_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['polish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_29(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/macedonian_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['macedonian_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_30(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/kosovo_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['kosovo_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_31(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/arabic_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['arabic_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_32(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/french_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['french_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_33(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/spanish_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['spanish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_34(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/portuguese_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['portuguese_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_east_european_career_crime(self):
-        german = self.loading_func('../data/word_lists/german_names.txt')
-        swiss = self.loading_func('../data/word_lists/swiss_names.txt')
-        austrian = self.loading_func('../data/word_lists/austrian_names.txt')
+        german = self.loading_func(self.wl_paths['german_names.txt'])
+        swiss = self.loading_func(self.wl_paths['swiss_names.txt'])
+        austrian = self.loading_func(self.wl_paths['austrian_names.txt'])
         targets_1 = german + swiss + austrian
 
-        serbish = self.loading_func('../data/word_lists/serbish_names.txt')
-        romanian = self.loading_func('../data/word_lists/romanian_names.txt')
-        polish = self.loading_func('../data/word_lists/polish_names.txt')
-        macedonian = self.loading_func('../data/word_lists/macedonian_names.txt')
-        kosovo = self.loading_func('../data/word_lists/kosovo_names.txt')
-        bosnian = self.loading_func('../data/word_lists/bosnian_names.txt')
-        croatian = self.loading_func('../data/word_lists/croatian_names.txt')
-        hungarian = self.loading_func('../data/word_lists/hungarian_names.txt')
-        slovak = self.loading_func('../data/word_lists/slovak_names.txt')
+        serbish = self.loading_func(self.wl_paths['serbish_names.txt'])
+        romanian = self.loading_func(self.wl_paths['romanian_names.txt'])
+        polish = self.loading_func(self.wl_paths['polish_names.txt'])
+        macedonian = self.loading_func(self.wl_paths['macedonian_names.txt'])
+        kosovo = self.loading_func(self.wl_paths['kosovo_names.txt'])
+        bosnian = self.loading_func(self.wl_paths['bosnian_names.txt'])
+        croatian = self.loading_func(self.wl_paths['croatian_names.txt'])
+        hungarian = self.loading_func(self.wl_paths['hungarian_names.txt'])
+        slovak = self.loading_func(self.wl_paths['slovak_names.txt'])
         targets_2 = serbish + romanian + polish + macedonian + kosovo + bosnian + croatian + hungarian + slovak
 
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_middle_eastern_career_crime(self):
-        german = self.loading_func('../data/word_lists/german_names.txt')
-        swiss = self.loading_func('../data/word_lists/swiss_names.txt')
-        austrian = self.loading_func('../data/word_lists/austrian_names.txt')
+        german = self.loading_func(self.wl_paths['german_names.txt'])
+        swiss = self.loading_func(self.wl_paths['swiss_names.txt'])
+        austrian = self.loading_func(self.wl_paths['austrian_names.txt'])
         targets_1 = german + swiss + austrian
 
-        afghani = self.loading_func('../data/word_lists/afghani_names.txt')
-        syrian = self.loading_func('../data/word_lists/syrian_names.txt')
-        turkish = self.loading_func('../data/word_lists/turkish_names.txt')
-        # arabic = self.loading_func('../data/word_lists/arabic_names.txt')
+        afghani = self.loading_func(self.wl_paths['afghani_names.txt'])
+        syrian = self.loading_func(self.wl_paths['syrian_names.txt'])
+        turkish = self.loading_func(self.wl_paths['turkish_names.txt'])
+        # arabic = self.loading_func(self.wl_paths['arabic_names.txt'])
         targets_2 = afghani + syrian + turkish
 
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_36(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt') + \
-                    self.loading_func('../data/word_lists/swiss_names.txt') + \
-                    self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/hebrew_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
+                    self.loading_func(self.wl_paths['swiss_names.txt']) + \
+                    self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['hebrew_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs swiss names and career vs crime
     def weat_37(self):
-        targets_1 = self.loading_func('../data/word_lists/german_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/swiss_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['german_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['swiss_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # swiss names vs austrian names and career vs crime
     def weat_38(self):
-        targets_1 = self.loading_func('../data/word_lists/swiss_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/austrian_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['swiss_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['austrian_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # austrian names vs german names and career vs crime
     def weat_39(self):
-        targets_1 = self.loading_func('../data/word_lists/austrian_names.txt')
-        targets_2 = self.loading_func('../data/word_lists/german_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/crime_german.txt')
+        targets_1 = self.loading_func(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.loading_func(self.wl_paths['german_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # --- gender tests ---
     def weat_male_german_female_german_career_family(self):
-        targets_1 = self.load_male_names('../data/word_lists/german_names.txt')
-        targets_2 = self.load_female_names('../data/word_lists/german_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/family.txt')
+        targets_1 = self.load_male_names(self.wl_paths['german_names.txt'])
+        targets_2 = self.load_female_names(self.wl_paths['german_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['family.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_male_swiss_female_swiss_career_family(self):
-        targets_1 = self.load_male_names('../data/word_lists/swiss_names.txt')
-        targets_2 = self.load_female_names('../data/word_lists/swiss_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/family.txt')
+        targets_1 = self.load_male_names(self.wl_paths['swiss_names.txt'])
+        targets_2 = self.load_female_names(self.wl_paths['swiss_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['family.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_male_austrian_female_austrian_career_family(self):
-        targets_1 = self.load_male_names('../data/word_lists/austrian_names.txt')
-        targets_2 = self.load_female_names('../data/word_lists/austrian_names.txt')
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/family.txt')
+        targets_1 = self.load_male_names(self.wl_paths['austrian_names.txt'])
+        targets_2 = self.load_female_names(self.wl_paths['austrian_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['family.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_male_germanic_female_germanic_career_family(self):
-        mgerman = self.load_male_names('../data/word_lists/german_names.txt')
-        mswiss = self.load_male_names('../data/word_lists/swiss_names.txt')
-        maustrian = self.load_male_names('../data/word_lists/austrian_names.txt')
+        mgerman = self.load_male_names(self.wl_paths['german_names.txt'])
+        mswiss = self.load_male_names(self.wl_paths['swiss_names.txt'])
+        maustrian = self.load_male_names(self.wl_paths['austrian_names.txt'])
         targets_1 = mgerman + mswiss + maustrian
-        fgerman = self.loading_func('../data/word_lists/german_names.txt')
-        fswiss = self.load_female_names('../data/word_lists/swiss_names.txt')
-        faustrian = self.load_female_names('../data/word_lists/austrian_names.txt')
+        fgerman = self.loading_func(self.wl_paths['german_names.txt'])
+        fswiss = self.load_female_names(self.wl_paths['swiss_names.txt'])
+        faustrian = self.load_female_names(self.wl_paths['austrian_names.txt'])
         targets_2 = fgerman + fswiss + faustrian
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/family.txt')
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['family.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # gender tests for eastern european names
     def weat_male_eastern_eu_female_eastern_eu_career_family(self):
-        mserbish = self.load_male_names('../data/word_lists/serbish_names.txt')
-        mromanian = self.load_male_names('../data/word_lists/romanian_names.txt')
-        mpolish = self.load_male_names('../data/word_lists/polish_names.txt')
-        mmacedonian = self.load_male_names('../data/word_lists/macedonian_names.txt')
-        mkosovo = self.load_male_names('../data/word_lists/kosovo_names.txt')
-        mbosnian = self.load_male_names('../data/word_lists/bosnian_names.txt')
-        mcroatian = self.load_male_names('../data/word_lists/croatian_names.txt')
-        mhungarian = self.load_male_names('../data/word_lists/hungarian_names.txt')
-        mslovak = self.load_male_names('../data/word_lists/slovak_names.txt')
+        mserbish = self.load_male_names(self.wl_paths['serbish_names.txt'])
+        mromanian = self.load_male_names(self.wl_paths['romanian_names.txt'])
+        mpolish = self.load_male_names(self.wl_paths['polish_names.txt'])
+        mmacedonian = self.load_male_names(self.wl_paths['macedonian_names.txt'])
+        mkosovo = self.load_male_names(self.wl_paths['kosovo_names.txt'])
+        mbosnian = self.load_male_names(self.wl_paths['bosnian_names.txt'])
+        mcroatian = self.load_male_names(self.wl_paths['croatian_names.txt'])
+        mhungarian = self.load_male_names(self.wl_paths['hungarian_names.txt'])
+        mslovak = self.load_male_names(self.wl_paths['slovak_names.txt'])
         targets_1 = mserbish + mromanian + mpolish + mmacedonian + mkosovo + mbosnian + mcroatian + mcroatian + \
                     mhungarian + mslovak
-        fserbish = self.load_female_names('../data/word_lists/serbish_names.txt')
-        fromanian = self.load_female_names('../data/word_lists/romanian_names.txt')
-        fpolish = self.load_female_names('../data/word_lists/polish_names.txt')
-        fmacedonian = self.load_female_names('../data/word_lists/macedonian_names.txt')
-        fkosovo = self.load_female_names('../data/word_lists/kosovo_names.txt')
-        fbosnian = self.load_female_names('../data/word_lists/bosnian_names.txt')
-        fcroatian = self.load_female_names('../data/word_lists/croatian_names.txt')
-        fhungarian = self.load_female_names('../data/word_lists/hungarian_names.txt')
-        fslovak = self.load_female_names('../data/word_lists/slovak_names.txt')
+        fserbish = self.load_female_names(self.wl_paths['serbish_names.txt'])
+        fromanian = self.load_female_names(self.wl_paths['romanian_names.txt'])
+        fpolish = self.load_female_names(self.wl_paths['polish_names.txt'])
+        fmacedonian = self.load_female_names(self.wl_paths['macedonian_names.txt'])
+        fkosovo = self.load_female_names(self.wl_paths['kosovo_names.txt'])
+        fbosnian = self.load_female_names(self.wl_paths['bosnian_names.txt'])
+        fcroatian = self.load_female_names(self.wl_paths['croatian_names.txt'])
+        fhungarian = self.load_female_names(self.wl_paths['hungarian_names.txt'])
+        fslovak = self.load_female_names(self.wl_paths['slovak_names.txt'])
         targets_2 = fserbish + fromanian + fpolish + fmacedonian + fkosovo + fbosnian + fcroatian + fhungarian + fslovak
-        attributes_1 = self.load_word_list('../data/word_lists/career.txt')
-        attributes_2 = self.load_word_list('../data/word_lists/family.txt')
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['family.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # gender tests for western european names
@@ -754,16 +768,26 @@ class XWEAT(object):
 
     # tests for anti-semitism
     def weat_german_jewish_pleasant_unpleasant(self):
-        pass
+        targets_1 = self.load_names(self.wl_paths['german_lastnames.txt'])
+        targets_2 = self.load_names(self.wl_paths['jewish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
+        return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_german_jewish_career_crime(self):
-        pass
+        targets_1 = self.load_names(self.wl_paths['german_lastnames.txt'])
+        targets_2 = self.load_names(self.wl_paths['jewish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime.txt'])
+        return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_german_jewish_conspiracy(self):
-        pass
-
+    # greedy vs virtuous TODO: load name subset
     def weat_german_jewish_greed_stereotype(self):
-        pass
+        targets_1 = self.load_names(self.wl_paths['german_lastnames.txt'])
+        targets_2 = self.load_names(self.wl_paths['jewish_names.txt'])
+        attributes_1 = self.load_word_list(self.wl_paths['virtuous.txt'])
+        attributes_2 = self.load_word_list(self.wl_paths['greed.txt'])
+        return targets_1, targets_2, attributes_1, attributes_2
 
     # occupations
     def wefat_1(self):
@@ -1070,12 +1094,13 @@ def main():
     parser.add_argument("--embeddings", type=str, help="Vectors and vocab of the embeddings")
     parser.add_argument("--lang", type=str, default="en", help="Language to test")
     parser.add_argument("--gender", type=str, default="both", help="Gender settings: 'both', 'female', 'male'")
+    parser.add_argument('--word_list_dir', type='str', help='Path to word list files.')
     args = parser.parse_args()
 
     start = time()
     logging.basicConfig(level=logging.INFO)
     logging.info("XWEAT started")
-    weat = XWEAT(gender=args.gender)
+    weat = XWEAT(gender=args.gender, word_list_dir=args.word_list_dir)
     if args.test_number == 1:
         targets_1, targets_2, attributes_1, attributes_2 = weat.weat_1()
     elif args.test_number == 2:
