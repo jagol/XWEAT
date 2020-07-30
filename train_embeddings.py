@@ -1,4 +1,5 @@
 import os
+import argparse
 import multiprocessing
 from time import time
 from gensim.models import Word2Vec
@@ -20,7 +21,7 @@ class Sentences(object):
 
 
 class callback(CallbackAny2Vec):
-    '''Callback to print loss after each epoch.'''
+    """Callback to print loss after each epoch."""
 
     def __init__(self):
         self.epoch = 0
@@ -35,7 +36,7 @@ def train_word2vec(path, fname_corpus):
     print(f'Train embeddings for corpus: {fname_corpus}')
     emb_dims = 300
     # sentences = Sentences(os.path.join(path, fname_corpus))
-    cores = multiprocessing.cpu_count() # Count the number of cores in a computer
+    cores = multiprocessing.cpu_count()  # Count the number of cores in a computer
     print('Start Training...')
     t = time()
     w2v_model = Word2Vec(min_count=5,
@@ -76,8 +77,23 @@ def train_word2vec(path, fname_corpus):
 #         train_word2vec(path, fn)
 
 def main():
-    # path = '/home/janis/Dropbox/UZH/10._Semester/NLP_in_Context_of_AI/Paper/WEAT_Experiments/data/'
-    train_word2vec('.', 'wiki_corpus.txt')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--corpus', choices=['wiki', 'sde', 'htb'], required=True)
+    parser.add_argument('--emb_dir', type=str, help='Directory where embeddings will be saved.', required=True)
+    args = parser.parse_args()
+
+    if not os.path.isdir(args.emb_dir):
+        raise Exception('Error. <emb_dir> is not a directory.')
+    if args.corpus == 'wiki':
+        path_corpus = '/mnt/storage/harlie/users/jgoldz/bias_germ_embeddings/data/wiki_corpus.txt'
+    elif args.corpus == 'sde':
+        path_corpus = '/mnt/storage/harlie/users/jgoldz/bias_germ_embeddings/data/sde_wac_ospl.txt'
+    elif args.corpus == 'htb':
+        path_corpus = ('/mnt/storage/harlie/users/jgoldz/bias_germ_embeddings/data/hamburg_dep_treebank/'
+                       'hamburg_tb_ospl.txt')
+    else:
+        raise Exception("Error. arg <corpus> must be either 'wiki', 'sde' or 'htb'")
+    train_word2vec(args.emb_dir, path_corpus)
 
 
 if __name__ == '__main__':
