@@ -1,10 +1,12 @@
 import os
 import pickle
+import argparse
+
 
 def get_terms():
     """Fetch all terms used in weat."""
     terms = []
-    dir_path_data = '/home/user/jgoldz/bias/data/word_lists'
+    dir_path_data = '/mnt/storage/harlie/users/jgoldz/bias_germ_embeddings/data/word_lists'
     for fn in os.listdir(dir_path_data):
         fpath = os.path.join(dir_path_data, fn)
         with open(fpath) as f:
@@ -47,14 +49,16 @@ def write_filtered_embs_to_file(filtered_embs, fpath):
 
 
 def trim_embeddings():
-    fpath_in = '/home/user/jgoldz/bias/data/german.model'
-    fpath_out = '/home/user/jgoldz/bias/data/german_trimmed.model'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True, help='Path to input file containing embeddings.')
+    parser.add_argument('--output', required=True, help='Path to output file where embeddings are written to.')
+    args = parser.parse_args()
     print('Loading terms...')
     terms = get_terms()
     print('Loading and filtering embeddings...')
-    embeddings = load_filter_embeddings(fpath_in, terms)
+    embeddings = load_filter_embeddings(args.input, terms)
     print('Writing embeddings to file...')
-    write_filtered_embs_to_file(embeddings, fpath_out)
+    write_filtered_embs_to_file(embeddings, args.output)
 
 
 if __name__ == '__main__':
