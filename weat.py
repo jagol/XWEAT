@@ -355,12 +355,15 @@ class XWEAT(object):
     def load_random_subset_of_female_names(self, fpath):
         raise NotImplementedError
 
-    def load_word_list(self, fpath):
+    @staticmethod
+    def load_word_list(fpath):
         with open(fpath) as f:
             return [line.strip('\n') for line in f if line.strip('\n')]
 
+    # test anti-migrant bias
+    # pleasant vs unpleasant
     # german names vs arabic names and pleasant vs unpleasant
-    def weat_11(self):
+    def weat_migrant_pleasant_unpleasant_1(self):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
@@ -370,7 +373,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs french names and pleasant vs unpleasant
-    def weat_12(self):
+    def weat_migrant_pleasant_unpleasant_2(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -380,7 +383,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs hebrew names and pleasant vs unpleasant
-    def weat_13(self):
+    def weat_migrant_pleasant_unpleasant_3(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -390,7 +393,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs kosovo names and pleasant vs unpleasant
-    def weat_14(self):
+    def weat_migrant_pleasant_unpleasant_4(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -400,7 +403,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs macedonian names and pleasant vs unpleasant
-    def weat_15(self):
+    def weat_migrant_pleasant_unpleasant_5(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -410,7 +413,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs polish names and pleasant vs unpleasant
-    def weat_16(self):
+    def weat_migrant_pleasant_unpleasant_6(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -420,7 +423,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs portuguese names and pleasant vs unpleasant
-    def weat_17(self):
+    def weat_migrant_pleasant_unpleasant_7(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -430,7 +433,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs romanian names and pleasant vs unpleasant
-    def weat_18(self):
+    def weat_migrant_pleasant_unpleasant_8(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -440,7 +443,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs serbish names and pleasant vs unpleasant
-    def weat_19(self):
+    def weat_migrant_pleasant_unpleasant_9(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -450,7 +453,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs spanish names and pleasant vs unpleasant
-    def weat_20(self):
+    def weat_migrant_pleasant_unpleasant_10(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -460,7 +463,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs swiss names and pleasant vs unpleasant
-    def weat_21(self):
+    def weat_migrant_pleasant_unpleasant_11(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt'])
         targets_2 = self.loading_func(self.wl_paths['swiss_names.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
@@ -468,7 +471,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # swiss names vs austrian names and pleasant vs unpleasant
-    def weat_22(self):
+    def weat_migrant_pleasant_unpleasant_12(self):
         targets_1 = self.loading_func(self.wl_paths['swiss_names.txt'])
         targets_2 = self.loading_func(self.wl_paths['austrian_names.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
@@ -476,7 +479,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # austrian names vs german names and pleasant vs unpleasant
-    def weat_23(self):
+    def weat_migrant_pleasant_unpleasant_13(self):
         targets_1 = self.loading_func(self.wl_paths['austrian_names.txt'])
         targets_2 = self.loading_func(self.wl_paths['german_names.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
@@ -484,7 +487,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs turkish names and pleasant vs unpleasant
-    def weat_24(self):
+    def weat_migrant_pleasant_unpleasant_14(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -494,7 +497,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # west_european_pleasant_unpleasant
-    def weat_25(self):
+    def weat_migrant_pleasant_unpleasant_15(self):
         german = self.loading_func(self.wl_paths['german_names.txt'])
         swiss = self.loading_func(self.wl_paths['swiss_names.txt'])
         austrian = self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -508,7 +511,8 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_east_european_pleasant_unpleasant(self):
+    def weat_migrant_pleasant_unpleasant_16(self):
+        # weat_east_european_pleasant_unpleasant
         german = self.loading_func(self.wl_paths['german_names.txt'])
         swiss = self.loading_func(self.wl_paths['swiss_names.txt'])
         austrian = self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -527,7 +531,8 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_middle_eastern_pleasant_unpleasant(self):
+    def weat_migrant_pleasant_unpleasant_17(self):
+        # weat_middle_eastern_pleasant_unpleasant
         german = self.loading_func(self.wl_paths['german_names.txt'])
         swiss = self.loading_func(self.wl_paths['swiss_names.txt'])
         austrian = self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -541,8 +546,9 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
+    # career vs crime
     # german names vs union of various eastern names and career vs crime
-    def weat_26(self):
+    def weat_migrant_career_crime_1(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -551,7 +557,7 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_25(self):
+    def weat_migrant_career_crime_2(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -560,7 +566,7 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_27(self):
+    def weat_migrant_career_crime_3(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -569,7 +575,7 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_28(self):
+    def weat_migrant_career_crime_4(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -578,7 +584,7 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_29(self):
+    def weat_migrant_career_crime_5(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -587,7 +593,7 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_30(self):
+    def weat_migrant_career_crime_6(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -596,7 +602,7 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_31(self):
+    def weat_migrant_career_crime_7(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -605,7 +611,7 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_32(self):
+    def weat_migrant_career_crime_8(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -614,7 +620,7 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_33(self):
+    def weat_migrant_career_crime_9(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -623,7 +629,7 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_34(self):
+    def weat_migrant_career_crime_10(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -632,7 +638,8 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_east_european_career_crime(self):
+    def weat_migrant_career_crime_11(self):
+        # weat_east_european_career_crime
         german = self.loading_func(self.wl_paths['german_names.txt'])
         swiss = self.loading_func(self.wl_paths['swiss_names.txt'])
         austrian = self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -653,7 +660,8 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_middle_eastern_career_crime(self):
+    def weat_migrant_career_crime_12(self):
+        # weat_middle_eastern_career_crime
         german = self.loading_func(self.wl_paths['german_names.txt'])
         swiss = self.loading_func(self.wl_paths['swiss_names.txt'])
         austrian = self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -669,7 +677,7 @@ class XWEAT(object):
         attributes_2 = self.load_word_list(self.wl_paths['crime_german.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_36(self):
+    def weat_migrant_career_crime_13(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt']) + \
                     self.loading_func(self.wl_paths['swiss_names.txt']) + \
                     self.loading_func(self.wl_paths['austrian_names.txt'])
@@ -679,7 +687,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # german names vs swiss names and career vs crime
-    def weat_37(self):
+    def weat_migrant_career_crime_14(self):
         targets_1 = self.loading_func(self.wl_paths['german_names.txt'])
         targets_2 = self.loading_func(self.wl_paths['swiss_names.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
@@ -687,7 +695,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # swiss names vs austrian names and career vs crime
-    def weat_38(self):
+    def weat_migrant_career_crime_15(self):
         targets_1 = self.loading_func(self.wl_paths['swiss_names.txt'])
         targets_2 = self.loading_func(self.wl_paths['austrian_names.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
@@ -695,7 +703,7 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # austrian names vs german names and career vs crime
-    def weat_39(self):
+    def weat_migrant_career_crime_16(self):
         targets_1 = self.loading_func(self.wl_paths['austrian_names.txt'])
         targets_2 = self.loading_func(self.wl_paths['german_names.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
@@ -703,28 +711,33 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # --- gender tests ---
-    def weat_male_german_female_german_career_family(self):
+    # germanic - career vs family
+    def weat_gender_career_family_1(self):
+        # weat_male_german_female_german_career_family
         targets_1 = self.load_male_names(self.wl_paths['german_names.txt'])
         targets_2 = self.load_female_names(self.wl_paths['german_names.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
         attributes_2 = self.load_word_list(self.wl_paths['family.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_male_swiss_female_swiss_career_family(self):
+    def weat_gender_career_family_2(self):
+        # weat_male_swiss_female_swiss_career_family
         targets_1 = self.load_male_names(self.wl_paths['swiss_names.txt'])
         targets_2 = self.load_female_names(self.wl_paths['swiss_names.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
         attributes_2 = self.load_word_list(self.wl_paths['family.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_male_austrian_female_austrian_career_family(self):
+    def weat_gender_career_family_3(self):
+        # weat_male_austrian_female_austrian_career_family
         targets_1 = self.load_male_names(self.wl_paths['austrian_names.txt'])
         targets_2 = self.load_female_names(self.wl_paths['austrian_names.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
         attributes_2 = self.load_word_list(self.wl_paths['family.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_male_germanic_female_germanic_career_family(self):
+    def weat_gender_career_family_4(self):
+        # weat_male_germanic_female_germanic_career_family
         mgerman = self.load_male_names(self.wl_paths['german_names.txt'])
         mswiss = self.load_male_names(self.wl_paths['swiss_names.txt'])
         maustrian = self.load_male_names(self.wl_paths['austrian_names.txt'])
@@ -738,7 +751,8 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # gender tests for eastern european names
-    def weat_male_eastern_eu_female_eastern_eu_career_family(self):
+    def weat_gender_career_family_5(self):
+        # weat_male_eastern_eu_female_eastern_eu_career_family
         mserbish = self.load_male_names(self.wl_paths['serbish_names.txt'])
         mromanian = self.load_male_names(self.wl_paths['romanian_names.txt'])
         mpolish = self.load_male_names(self.wl_paths['polish_names.txt'])
@@ -765,7 +779,8 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # gender tests for western european names
-    def weat_male_west_european_female_western_european_career_family(self):
+    def weat_gender_career_family_6(self):
+        # weat_male_west_european_female_western_european_career_family
         mfrench = self.load_male_names(self.wl_paths['french_names.txt'])
         mitalian = self.load_male_names(self.wl_paths['italian_names.txt'])
         mportuguese = self.load_male_names(self.wl_paths['portuguese_names.txt'])
@@ -781,7 +796,8 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # gender tests for middle eastern names
-    def weat_male_middle_eastern_female_middle_eastern_career_family(self):
+    def weat_gender_career_family_7(self):
+        # weat_male_middle_eastern_female_middle_eastern_career_family
         mafghani = self.load_male_names(self.wl_paths['afghani_names.txt'])
         msyrian = self.load_male_names(self.wl_paths['syrian_names.txt'])
         mturkish = self.load_male_names(self.wl_paths['turkish_names.txt'])
@@ -795,24 +811,27 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # tests for anti-semitism
-    def weat_german_jewish_pleasant_unpleasant(self):
+    def weat_jewish_pleasant_unpleasant_1(self):
+        # weat_german_jewish_pleasant_unpleasant
         targets_1 = self.load_names(self.wl_paths['german_lastnames.txt'])
-        targets_2 = self.load_names(self.wl_paths['jewish_lastnames.txt'])
+        targets_2 = self.load_names(self.wl_paths['jewish_lastnames_in_all_voc.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant.txt'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
-    def weat_german_jewish_career_crime(self):
+    def weat_jewish_career_crime_1(self):
+        # weat_german_jewish_career_crime
         targets_1 = self.load_names(self.wl_paths['german_lastnames.txt'])
-        targets_2 = self.load_names(self.wl_paths['jewish_lastnames.txt'])
+        targets_2 = self.load_names(self.wl_paths['jewish_lastnames_in_all_voc.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['career.txt'])
         attributes_2 = self.load_word_list(self.wl_paths['crime.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # greedy vs virtuous TODO: load name subset
-    def weat_german_jewish_greed_stereotype(self):
+    def weat_jewish_virtuous_greed_1(self):
+        # weat_german_jewish_greed_stereotype
         targets_1 = self.load_names(self.wl_paths['german_lastnames.txt'])
-        targets_2 = self.load_names(self.wl_paths['jewish_lastnames.txt'])
+        targets_2 = self.load_names(self.wl_paths['jewish_lastnames_in_all_voc.txt'])
         attributes_1 = self.load_word_list(self.wl_paths['virtuous.txt'])
         attributes_2 = self.load_word_list(self.wl_paths['greed.txt'])
         return targets_1, targets_2, attributes_1, attributes_2
