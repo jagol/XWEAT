@@ -35,7 +35,7 @@ class XWEAT(object):
         elif self.gender == 'female':
             self.loading_func = self.load_female_names
         elif self.gender == 'male':
-            self.loading_func = self.loading_func
+            self.loading_func = self.load_male_names
         else:
             raise Exception('Gender option not known.')
 
@@ -1125,7 +1125,7 @@ def main():
             raise ValueError('Not a valid boolean string')
         return s == 'True' or s == 'true'
     parser = argparse.ArgumentParser(description='Running XWEAT')
-    parser.add_argument('--test_number', type=int, help='Number of the weat test to run', required=False)
+    parser.add_argument('--test_id', type=str, help='ID of the weat test to run', required=False)
     parser.add_argument('--permutation_number', type=int, default=None,
                                             help='Number of permutations (otherwise all will be run)', required=False)
     parser.add_argument('--output_file', type=str, default=None, help='File to store the results)', required=False)
@@ -1148,80 +1148,11 @@ def main():
     logging.basicConfig(level=logging.INFO)
     logging.info('XWEAT started')
     weat = XWEAT(gender=args.gender, word_list_dir=args.word_list_dir)
-    if args.test_number == 1:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_1()
-    elif args.test_number == 2:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_2()
-    elif args.test_number == 3:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_3()
-    elif args.test_number == 4:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_4()
-    elif args.test_number == 5:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_5()
-    elif args.test_number == 6:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_6()
-    elif args.test_number == 7:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_7()
-    elif args.test_number == 8:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_8()
-    elif args.test_number == 9:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_9()
-    elif args.test_number == 10:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_10()
-    elif args.test_number == 11:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_11()
-    elif args.test_number == 12:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_12()
-    elif args.test_number == 13:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_13()
-    elif args.test_number == 14:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_14()
-    elif args.test_number == 15:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_15()
-    elif args.test_number == 16:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_16()
-    elif args.test_number == 17:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_17()
-    elif args.test_number == 18:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_18()
-    elif args.test_number == 19:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_19()
-    elif args.test_number == 20:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_20()
-    elif args.test_number == 21:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_21()
-    elif args.test_number == 22:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_22()
-    elif args.test_number == 23:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_23()
-    elif args.test_number == 24:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_24()
-    elif args.test_number == 25:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_25()
-    elif args.test_number == 26:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_26()
-    elif args.test_number == 27:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_27()
-    elif args.test_number == 28:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_28()
-    elif args.test_number == 29:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_29()
-    elif args.test_number == 30:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_30()
-    elif args.test_number == 31:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_31()
-    elif args.test_number == 32:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_32()
-    elif args.test_number == 33:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_33()
-    elif args.test_number == 34:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_34()
-    elif args.test_number == 35:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_35()
-    elif args.test_number == 36:
-        targets_1, targets_2, attributes_1, attributes_2 = weat.weat_36()
-    else:
-        raise ValueError('Only WEAT 1 to 35 are supported')
+    try:
+        test_id = getattr(XWEAT, args.test_id)  # test_id is the method-name
+    except AttributeError:
+        raise Exception(f'Error. Test-id/Method {args.test_id} not known.')
+    targets_1, targets_2, attributes_1, attributes_2 = test_id(weat)  # test_id is the method-name
     if args.lang != 'en':
         logging.info('Translating terms from en to %s', args.lang)
         translation_dict = load_vocab_goran('./data/vocab_dict_en_' + args.lang + '.p')
