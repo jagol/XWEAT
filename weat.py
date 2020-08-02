@@ -43,7 +43,7 @@ class XWEAT(object):
         """Create paths for all word list files."""
         wl_paths = {}
         for fname in os.listdir(word_list_dir):
-            key = fname.strip('.txt')
+            key = fname[:-4]
             wl_paths[key] = os.path.join(word_list_dir, fname)
         return wl_paths
 
@@ -59,7 +59,7 @@ class XWEAT(object):
                 self.vocab[term] = index
                 index += 1
             else:
-                logging.warning('Not in vocab %s', term)
+                print('Not in vocab %s', term)
 
     def convert_by_vocab(self, items):
         """Converts a sequence of [tokens|ids] using the vocab."""
@@ -250,6 +250,7 @@ class XWEAT(object):
         targets_1 = self.load_names(self.wl_paths['german_names']) + \
                     self.load_names(self.wl_paths['swiss_names']) + \
                     self.load_names(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         # excluded in GloVe experiments:    Tremayne, Latonya,
         targets_2 = [
             'Darnell', 'Hakim', 'Jermaine', 'Kareem', 'Jamal', 'Leroy', 'Rasheed', 'Tyrone', 'Aisha', 'Ebony',
@@ -370,6 +371,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['arabic_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
@@ -380,6 +382,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['french_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
@@ -387,10 +390,8 @@ class XWEAT(object):
 
     # german names vs hebrew names and pleasant vs unpleasant
     def weat_migrant_pleasant_unpleasant_3(self):
-        targets_1 = self.loading_func(self.wl_paths['german_names']) + \
-                    self.loading_func(self.wl_paths['swiss_names']) + \
-                    self.loading_func(self.wl_paths['austrian_names'])
-        targets_2 = self.loading_func(self.wl_paths['hebrew_names'])
+        targets_1 = self.load_names(self.wl_paths['german_lastnames'])
+        targets_2 = self.load_names(self.wl_paths['hebrew_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -400,6 +401,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['kosovo_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
@@ -410,6 +412,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['macedonian_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
@@ -420,6 +423,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['polish_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
@@ -430,6 +434,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['portuguese_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
@@ -440,6 +445,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['romanian_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
@@ -450,6 +456,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['serbish_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
@@ -460,6 +467,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['spanish_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
@@ -494,6 +502,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['turkish_names'])
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
@@ -505,11 +514,13 @@ class XWEAT(object):
         swiss = self.loading_func(self.wl_paths['swiss_names'])
         austrian = self.loading_func(self.wl_paths['austrian_names'])
         targets_1 = german + swiss + austrian
+        random.shuffle(targets_1)
         french = self.loading_func(self.wl_paths['french_names'])
         italian = self.loading_func(self.wl_paths['italian_names'])
         portuguese = self.loading_func(self.wl_paths['portuguese_names'])
         spanish = self.loading_func(self.wl_paths['spanish_names'])
         targets_2 = french + italian + portuguese + spanish
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -520,6 +531,7 @@ class XWEAT(object):
         swiss = self.loading_func(self.wl_paths['swiss_names'])
         austrian = self.loading_func(self.wl_paths['austrian_names'])
         targets_1 = german + swiss + austrian
+        random.shuffle(targets_1)
         serbish = self.loading_func(self.wl_paths['serbish_names'])
         romanian = self.loading_func(self.wl_paths['romanian_names'])
         polish = self.loading_func(self.wl_paths['polish_names'])
@@ -530,6 +542,7 @@ class XWEAT(object):
         hungarian = self.loading_func(self.wl_paths['hungarian_names'])
         slovak = self.loading_func(self.wl_paths['slovak_names'])
         targets_2 = serbish + romanian + polish + macedonian + kosovo + bosnian + croatian + hungarian + slovak
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -540,11 +553,13 @@ class XWEAT(object):
         swiss = self.loading_func(self.wl_paths['swiss_names'])
         austrian = self.loading_func(self.wl_paths['austrian_names'])
         targets_1 = german + swiss + austrian
+        random.shuffle(targets_1)
         afghani = self.loading_func(self.wl_paths['afghani_names'])
         syrian = self.loading_func(self.wl_paths['syrian_names'])
         turkish = self.loading_func(self.wl_paths['turkish_names'])
         # arabic = self.loading_func(self.wl_paths['arabic_names'])
         targets_2 = afghani + syrian + turkish
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -555,6 +570,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['turkish_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
@@ -564,6 +580,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['serbish_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
@@ -573,6 +590,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['romanian_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
@@ -582,6 +600,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['polish_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
@@ -591,6 +610,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['macedonian_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
@@ -600,6 +620,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['kosovo_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
@@ -609,6 +630,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['arabic_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
@@ -618,6 +640,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['french_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
@@ -627,6 +650,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['spanish_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
@@ -636,6 +660,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = self.loading_func(self.wl_paths['portuguese_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
@@ -647,7 +672,7 @@ class XWEAT(object):
         swiss = self.loading_func(self.wl_paths['swiss_names'])
         austrian = self.loading_func(self.wl_paths['austrian_names'])
         targets_1 = german + swiss + austrian
-
+        random.shuffle(targets_1)
         serbish = self.loading_func(self.wl_paths['serbish_names'])
         romanian = self.loading_func(self.wl_paths['romanian_names'])
         polish = self.loading_func(self.wl_paths['polish_names'])
@@ -658,7 +683,7 @@ class XWEAT(object):
         hungarian = self.loading_func(self.wl_paths['hungarian_names'])
         slovak = self.loading_func(self.wl_paths['slovak_names'])
         targets_2 = serbish + romanian + polish + macedonian + kosovo + bosnian + croatian + hungarian + slovak
-
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -669,22 +694,20 @@ class XWEAT(object):
         swiss = self.loading_func(self.wl_paths['swiss_names'])
         austrian = self.loading_func(self.wl_paths['austrian_names'])
         targets_1 = german + swiss + austrian
-
+        random.shuffle(targets_1)
         afghani = self.loading_func(self.wl_paths['afghani_names'])
         syrian = self.loading_func(self.wl_paths['syrian_names'])
         turkish = self.loading_func(self.wl_paths['turkish_names'])
         # arabic = self.loading_func(self.wl_paths['arabic_names'])
         targets_2 = afghani + syrian + turkish
-
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     def weat_migrant_career_crime_13(self):
-        targets_1 = self.loading_func(self.wl_paths['german_names']) + \
-                    self.loading_func(self.wl_paths['swiss_names']) + \
-                    self.loading_func(self.wl_paths['austrian_names'])
-        targets_2 = self.loading_func(self.wl_paths['hebrew_names'])
+        targets_1 = self.load_names(self.wl_paths['german_lastnames'])
+        targets_2 = self.load_names(self.wl_paths['hebrew_names'])
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -709,6 +732,22 @@ class XWEAT(object):
     def weat_migrant_career_crime_16(self):
         targets_1 = self.loading_func(self.wl_paths['austrian_names'])
         targets_2 = self.loading_func(self.wl_paths['german_names'])
+        attributes_1 = self.load_word_list(self.wl_paths['career'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    def weat_migrant_career_crime_17(self):
+        german = self.loading_func(self.wl_paths['german_names'])
+        swiss = self.loading_func(self.wl_paths['swiss_names'])
+        austrian = self.loading_func(self.wl_paths['austrian_names'])
+        targets_1 = german + swiss + austrian
+        random.shuffle(targets_1)
+        french = self.loading_func(self.wl_paths['french_names'])
+        italian = self.loading_func(self.wl_paths['italian_names'])
+        portuguese = self.loading_func(self.wl_paths['portuguese_names'])
+        spanish = self.loading_func(self.wl_paths['spanish_names'])
+        targets_2 = french + italian + portuguese + spanish
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -745,10 +784,12 @@ class XWEAT(object):
         mswiss = self.load_male_names(self.wl_paths['swiss_names'])
         maustrian = self.load_male_names(self.wl_paths['austrian_names'])
         targets_1 = mgerman + mswiss + maustrian
+        random.shuffle(targets_1)
         fgerman = self.loading_func(self.wl_paths['german_names'])
         fswiss = self.load_female_names(self.wl_paths['swiss_names'])
         faustrian = self.load_female_names(self.wl_paths['austrian_names'])
         targets_2 = fgerman + fswiss + faustrian
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['family'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -767,6 +808,7 @@ class XWEAT(object):
         mslovak = self.load_male_names(self.wl_paths['slovak_names'])
         targets_1 = mserbish + mromanian + mpolish + mmacedonian + mkosovo + mbosnian + mcroatian + mcroatian + \
                     mhungarian + mslovak
+        random.shuffle(targets_1)
         fserbish = self.load_female_names(self.wl_paths['serbish_names'])
         fromanian = self.load_female_names(self.wl_paths['romanian_names'])
         fpolish = self.load_female_names(self.wl_paths['polish_names'])
@@ -777,6 +819,7 @@ class XWEAT(object):
         fhungarian = self.load_female_names(self.wl_paths['hungarian_names'])
         fslovak = self.load_female_names(self.wl_paths['slovak_names'])
         targets_2 = fserbish + fromanian + fpolish + fmacedonian + fkosovo + fbosnian + fcroatian + fhungarian + fslovak
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['family'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -789,11 +832,13 @@ class XWEAT(object):
         mportuguese = self.load_male_names(self.wl_paths['portuguese_names'])
         mspanish = self.load_male_names(self.wl_paths['spanish_names'])
         targets_1 = mfrench + mitalian + mportuguese + mspanish
+        random.shuffle(targets_1)
         ffrench = self.load_male_names(self.wl_paths['french_names'])
         fitalian = self.load_male_names(self.wl_paths['italian_names'])
         fportuguese = self.load_male_names(self.wl_paths['portuguese_names'])
         fspanish = self.load_male_names(self.wl_paths['spanish_names'])
         targets_2 = ffrench + fitalian + fportuguese + fspanish
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['family'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -805,10 +850,12 @@ class XWEAT(object):
         msyrian = self.load_male_names(self.wl_paths['syrian_names'])
         mturkish = self.load_male_names(self.wl_paths['turkish_names'])
         targets_1 = mafghani + msyrian + mturkish
+        random.shuffle(targets_1)
         fafghani = self.load_female_names(self.wl_paths['afghani_names'])
         fsyrian = self.load_female_names(self.wl_paths['syrian_names'])
         fturkish = self.load_female_names(self.wl_paths['turkish_names'])
         targets_2 = fafghani + fsyrian + fturkish
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['family'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -844,13 +891,15 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = [
             'Adam', 'Harry', 'Josh', 'Roger', 'Alan', 'Frank', 'Justin', 'Ryan', 'Andrew', 'Jack', 'Matthew', 'Stephen',
             'Brad', 'Greg', 'Paul', 'Hank', 'Jonathan', 'Peter', 'Amanda', 'Courtney', 'Heather', 'Melanie', 'Katie',
-            'Betsy', 'Kristin', 'Nancy', 'Stephanie', 'Ellen', 'Lauren',    'Colleen', 'Emily', 'Megan', 'Rachel',
+            'Betsy', 'Kristin', 'Nancy', 'Stephanie', 'Ellen', 'Lauren', 'Colleen', 'Emily', 'Megan', 'Rachel',
             'Chip', 'Ian', 'Fred', 'Jed', 'Todd', 'Brandon', 'Wilbur', 'Sara', 'Amber', 'Crystal', 'Meredith',
             'Shannon', 'Donna', 'Bobbie-Sue', 'Peggy', 'Sue-Ellen', 'Wendy'
         ]
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
         attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
         return targets_1, targets_2, attributes_1, attributes_2
@@ -859,6 +908,7 @@ class XWEAT(object):
         targets_1 = self.loading_func(self.wl_paths['german_names']) + \
                     self.loading_func(self.wl_paths['swiss_names']) + \
                     self.loading_func(self.wl_paths['austrian_names'])
+        random.shuffle(targets_1)
         targets_2 = [
             'Adam', 'Harry', 'Josh', 'Roger', 'Alan', 'Frank', 'Justin', 'Ryan', 'Andrew', 'Jack', 'Matthew', 'Stephen',
             'Brad', 'Greg', 'Paul', 'Hank', 'Jonathan', 'Peter', 'Amanda', 'Courtney', 'Heather', 'Melanie', 'Katie',
@@ -866,8 +916,9 @@ class XWEAT(object):
             'Chip', 'Ian', 'Fred', 'Jed', 'Todd', 'Brandon', 'Wilbur', 'Sara', 'Amber', 'Crystal', 'Meredith',
             'Shannon', 'Donna', 'Bobbie-Sue', 'Peggy', 'Sue-Ellen', 'Wendy'
         ]
+        random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['career'])
-        attributes_2 = self.load_word_list(self.wl_paths['crime'])
+        attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # occupations
@@ -922,17 +973,17 @@ class XWEAT(object):
         return tuple(random.sample(pool, r))
 
     def weat_p_value_precomputed_sims(self, T1, T2, A1, A2, sample):
-        logging.info('Calculating p value ... ')
+        print('Calculating p value ... ')
         size_of_permutation = min(len(T1), len(T2))
         T1_T2 = T1 + T2
         observed_test_stats_over_permutations = []
         total_possible_permutations = math.factorial(len(T1_T2)) / math.factorial(size_of_permutation) / \
                                       math.factorial((len(T1_T2)-size_of_permutation))
-        logging.info('Number of possible permutations: %d', total_possible_permutations)
+        print('Number of possible permutations: %d', total_possible_permutations)
         if not sample or sample >= total_possible_permutations:
             permutations = combinations(T1_T2, size_of_permutation)
         else:
-            logging.info('Computing randomly first %d permutations', sample)
+            print('Computing randomly first %d permutations', sample)
             permutations = set()
             while len(permutations) < sample:
                 permutations.add(tuple(sorted(self._random_permutation(T1_T2, size_of_permutation))))
@@ -941,7 +992,7 @@ class XWEAT(object):
             Yi = filterfalse(lambda w: w in Xi, T1_T2)
             observed_test_stats_over_permutations.append(self.differential_association_precomputed_sims(Xi, Yi, A1, A2))
             if len(observed_test_stats_over_permutations) % 100000 == 0:
-                logging.info('Iteration %s finished', str(len(observed_test_stats_over_permutations)))
+                print('Iteration %s finished', str(len(observed_test_stats_over_permutations)))
         unperturbed = self.differential_association_precomputed_sims(T1, T2, A1, A2)
         is_over = np.array([o > unperturbed for o in observed_test_stats_over_permutations])
         return is_over.sum() / is_over.size
@@ -1000,22 +1051,27 @@ class XWEAT(object):
         A1 = self.convert_by_vocab(attributes_1)
         A2 = self.convert_by_vocab(attributes_2)
         while len(T1) < len(T2):
-            logging.info('Popped T2 %d', T2[-1])
+            print('Popped T2 %d', T2[-1])
             T2.pop(-1)
         while len(T2) < len(T1):
-            logging.info('Popped T1 %d', T1[-1])
+            print('Popped T1 %d', T1[-1])
             T1.pop(-1)
         while len(A1) < len(A2):
-            logging.info('Popped A2 %d', A2[-1])
+            print('Popped A2 %d', A2[-1])
             A2.pop(-1)
         while len(A2) < len(A1):
-            logging.info('Popped A1 %d', A1[-1])
+            print('Popped A1 %d', A1[-1])
             A1.pop(-1)
         assert len(T1) == len(T2)
         assert len(A1) == len(A2)
+        print(f'T1: {T1}')
+        print(f'T2: {T2}')
+        print(f'A1: {A1}')
+        print(f'A2: {A2}')
+        warning = 'Warning' if len(T1) < 5 else None
         self._build_embedding_matrix()
         self._init_similarities(similarity_type)
-        return self.weat_stats_precomputed_sims(T1, T2, A1, A2, sample_p)
+        return self.weat_stats_precomputed_sims(T1, T2, A1, A2, sample_p), warning
 
     def _parse_translations(self, path='./data/vocab_en_de.csv', new_path='./data/vocab_dict_en_de.p',
                             is_russian=False):
@@ -1093,22 +1149,26 @@ def load_embedding_dict(vocab_path='', vector_path='', embeddings_path='', glove
         assert len(embd_dict) == len(vocab)
         return embd_dict
 
+
 def translate(translation_dict, terms):
     translation = []
-    for t in terms:
-        if t in translation_dict or t.lower() in translation_dict:
-            if t.lower() in translation_dict:
-                male, female = translation_dict[t.lower()]
-            elif t in translation_dict:
-                male, female = translation_dict[t]
-            if female is None or female is '':
-                translation.append(male)
+    try:
+        for t in terms:
+            if t in translation_dict or t.lower() in translation_dict:
+                if t.lower() in translation_dict:
+                    male, female = translation_dict[t.lower()]
+                elif t in translation_dict:
+                    male, female = translation_dict[t]
+                if female is None or female is '':
+                    translation.append(male)
+                else:
+                    translation.append(male)
+                    translation.append(female)
             else:
-                translation.append(male)
-                translation.append(female)
-        else:
-            translation.append(t)
-    translation = list(set(translation))
+                translation.append(t)
+        translation = list(set(translation))
+    except TypeError:
+        import pdb; pdb.set_trace()
     return translation
 
 def compute_oov_percentage():
@@ -1172,7 +1232,7 @@ def run_weat_test(test_id, embeddings, permutation_number=100000, do_lower=True,
     """
     start = time()
     logging.basicConfig(level=logging.INFO)
-    logging.info('XWEAT started')
+    print('XWEAT started')
     word_list_dir = '/mnt/storage/harlie/users/jgoldz/bias_germ_embeddings/data/word_lists'
     weat = XWEAT(gender=gender, word_list_dir=word_list_dir)
     try:
@@ -1181,7 +1241,7 @@ def run_weat_test(test_id, embeddings, permutation_number=100000, do_lower=True,
         raise Exception(f'Error. Test-id/Method {test_id} not known.')
     targets_1, targets_2, attributes_1, attributes_2 = test_id(weat)  # test_id is the method-name
     if lang != 'en':
-        logging.info('Translating terms from en to %s', lang)
+        print('Translating terms from en to %s', lang)
         translation_dict = load_vocab_goran('./data/vocab_dict_en_' + lang + '.p')
         targets_1 = translate(translation_dict, targets_1)
         targets_2 = translate(translation_dict, targets_2)
@@ -1195,18 +1255,18 @@ def run_weat_test(test_id, embeddings, permutation_number=100000, do_lower=True,
 
     t = time()
     embd_dict = load_embedding_dict(embeddings_path=embeddings, glove=False)
-    logging.info(f'Loading of embeddings took {round((time() - t) / 60, 2) }')
+    print(f'Loading of embeddings took {round((time() - t) / 60, 2) }')
     weat.set_embd_dict(embd_dict)
-    logging.info('Embeddings loaded')
-    logging.info('Running test')
-    result = weat.run_test_precomputed_sims(targets_1, targets_2, attributes_1, attributes_2, permutation_number,
-                                            similarity_type)
+    print('Embeddings loaded')
+    print('Running test')
+    result, warning = weat.run_test_precomputed_sims(targets_1, targets_2, attributes_1, attributes_2,
+                                                     permutation_number, similarity_type)
     results_repr = f'test-statistic: {result[0]:.3f}, effect-size: {result[1]:.3f}, p-value: {result[2]:.3f}'
-    results_dict = {'test-statistic': result[0], 'effect-size': result[1], 'p-value': result[2]}
-    logging.info(results_repr)
+    results_dict = {'test-statistic': result[0], 'effect-size': result[1], 'p-value': result[2], 'warning': warning}
+    print(results_repr)
     end = time()
     duration_in_hours = ((end - start) / 60) / 60
-    logging.info(f'Duration in hours: {duration_in_hours}')
+    print(f'Duration in hours: {duration_in_hours}')
     return results_dict
 
 def main():
@@ -1235,8 +1295,8 @@ def main():
     args = parser.parse_args()
 
     start = time()
-    logging.basicConfig(level=logging.INFO)
-    logging.info('XWEAT started')
+    logging.basicConfig(level=print)
+    print('XWEAT started')
     word_list_dir = '/mnt/storage/harlie/users/jgoldz/bias_germ_embeddings/data/word_lists'
     weat = XWEAT(gender=args.gender, word_list_dir=word_list_dir)
     try:
@@ -1245,7 +1305,7 @@ def main():
         raise Exception(f'Error. Test-id/Method {args.test_id} not known.')
     targets_1, targets_2, attributes_1, attributes_2 = test_id(weat)  # test_id is the method-name
     if args.lang != 'en':
-        logging.info('Translating terms from en to %s', args.lang)
+        print('Translating terms from en to %s', args.lang)
         translation_dict = load_vocab_goran('./data/vocab_dict_en_' + args.lang + '.p')
         targets_1 = translate(translation_dict, targets_1)
         targets_2 = translate(translation_dict, targets_2)
@@ -1258,27 +1318,28 @@ def main():
         attributes_2 = [a.lower() for a in attributes_2]
 
     if args.use_glove:
-        logging.info('Using glove')
+        print('Using glove')
         embd_dict = load_embedding_dict(glove=True)
     elif args.postspec:
-        logging.info('Using postspecialized embeddings')
+        print('Using postspecialized embeddings')
         embd_dict = load_embedding_dict(postspec=True)
     elif args.is_vec_format:
-        logging.info('Embeddings are in vec format')
+        print('Embeddings are in vec format')
         t = time()
         embd_dict = load_embedding_dict(embeddings_path=args.embeddings, glove=False)
-        logging.info(f'Loading of embeddings took {round((time() - t) / 60, 2) }')
+        print(f'Loading of embeddings took {round((time() - t) / 60, 2) }')
     else:
         embd_dict = load_embedding_dict(vocab_path=args.embedding_vocab, vector_path=args.embedding_vectors,
                                         glove=False)
     weat.set_embd_dict(embd_dict)
 
-    logging.info('Embeddings loaded')
-    logging.info('Running test')
-    result = weat.run_test_precomputed_sims(targets_1, targets_2, attributes_1, attributes_2, args.permutation_number,
-                                            args.similarity_type)
+    print('Embeddings loaded')
+    print('Running test')
+    result, warning = weat.run_test_precomputed_sims(targets_1, targets_2, attributes_1, attributes_2,
+                                                     args.permutation_number, args.similarity_type)
     results_repr = f'test-statistic: {result[0]:.3f}, effect-size: {result[1]:.3f}, p-value: {result[2]:.3f}'
-    logging.info(results_repr)
+    print(results_repr)
+    print(f'Warning: {warning}')
     mode = 'a' if os.path.exists(args.output_file) else 'w'
     with codecs.open(args.output_file, mode, 'utf8') as f:
         f.write('-----\n')
@@ -1289,6 +1350,7 @@ def main():
         f.write('Result: ')
         f.write(results_repr)
         f.write(str(result))
+        f.write(f'Warning: {warning}')
         f.write('\n')
         end = time()
         duration_in_hours = ((end - start) / 60) / 60
