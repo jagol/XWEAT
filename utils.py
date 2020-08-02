@@ -87,7 +87,7 @@ def load_embeddings(path, word2vec=False, rdf2vec=False):
             for line in infile:
                 try:
                     parts = line.split()
-                    word = parts[0]
+                    word = parts[0].lower()
                     nums = [float(p) for p in parts[1:]]
                     embbedding_dict[word] = nums
                 except Exception as e:
