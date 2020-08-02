@@ -21,7 +21,7 @@ def get_terms():
                 for w1, w2 in dict.values():
                     terms.append(w1)
                     terms.append(w2)
-    return [term for term in terms if term]
+    return [term.lower() for term in terms if term]
 
 
 def load_filter_embeddings(fpath, terms):
@@ -30,8 +30,8 @@ def load_filter_embeddings(fpath, terms):
     with open(fpath) as f:
         for line in f:
             fields = line.strip('\n').split(' ')
-            word = fields[0]
-            if word.lower() in terms:
+            word = fields[0].lower()
+            if word in terms:
                 vec = [float(num) for num in fields[1:]]
                 embeddings[word] = vec
     return embeddings
