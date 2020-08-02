@@ -2,7 +2,7 @@ import csv
 from weat import run_weat_test
 
 lang = 'de'
-permutation_number = 10
+permutation_number = 100000
 do_lower = True
 similarity_type = 'cosine'
 genders = ['both', 'male', 'female']
