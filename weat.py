@@ -191,14 +191,15 @@ class XWEAT(object):
         targets_1 = self.load_names(self.wl_paths['german_names']) + \
                     self.load_names(self.wl_paths['swiss_names']) + \
                     self.load_names(self.wl_paths['austrian_names'])
-        targets_2 = [
-            'Alonzo', 'Jamel', 'Theo', 'Alphonse', 'Jerome', 'Leroy', 'Torrance', 'Darnell', 'Lamar', 'Lionel',
-            'Tyree', 'Deion', 'Lamont', 'Malik', 'Terrence', 'Tyrone', 'Lavon', 'Marcellus', 'Wardell', 'Nichelle',
-            'Shereen', 'Ebony', 'Latisha', 'Shaniqua', 'Jasmine', 'Tanisha', 'Tia', 'Lakisha', 'Latoya', 'Yolanda',
-            'Malika', 'Yvette', 'Lerone', 'Percell', 'Rasaan', 'Rashaun', 'Everol', 'Terryl', 'Aiesha', 'Lashelle',
-            'Temeka', 'Tameisha', 'Teretha', 'Latonya', 'Shanise', 'Sharise', 'Tashika', 'Lashandra', 'Shavonn',
-            'Tawanda'
-        ]
+        targets_2 = self.load_names(self.wl_paths['african_names_in_german_corpora'])
+        # targets_2 = [
+        #     'Alonzo', 'Jamel', 'Theo', 'Alphonse', 'Jerome', 'Leroy', 'Torrance', 'Darnell', 'Lamar', 'Lionel',
+        #     'Tyree', 'Deion', 'Lamont', 'Malik', 'Terrence', 'Tyrone', 'Lavon', 'Marcellus', 'Wardell', 'Nichelle',
+        #     'Shereen', 'Ebony', 'Latisha', 'Shaniqua', 'Jasmine', 'Tanisha', 'Tia', 'Lakisha', 'Latoya', 'Yolanda',
+        #     'Malika', 'Yvette', 'Lerone', 'Percell', 'Rasaan', 'Rashaun', 'Everol', 'Terryl', 'Aiesha', 'Lashelle',
+        #     'Temeka', 'Tameisha', 'Teretha', 'Latonya', 'Shanise', 'Sharise', 'Tashika', 'Lashandra', 'Shavonn',
+        #     'Tawanda'
+        # ]
         attributes_1 = [
             'caress', 'freedom', 'health', 'love', 'peace', 'cheer', 'friend', 'heaven', 'loyal', 'pleasure',
             'diamond', 'gentle', 'honest', 'lucky', 'rainbow', 'diploma', 'gift', 'honor', 'miracle', 'sunrise',
@@ -223,10 +224,7 @@ class XWEAT(object):
                     self.load_names(self.wl_paths['swiss_names']) + \
                     self.load_names(self.wl_paths['austrian_names'])
         # excluded in GloVe experiments:    Tremayne, Latonya,
-        targets_2 = [
-            'Darnell', 'Hakim', 'Jermaine', 'Kareem', 'Jamal', 'Leroy', 'Rasheed', 'Tyrone', 'Aisha', 'Ebony',
-            'Keisha', 'Kenya',    'Lakisha', 'Latoya', 'Tamika', 'Tanisha', 'Tremayne', 'Latonya'
-        ]
+        targets_2 = self.load_names(self.wl_paths['african_names_in_german_corpora'])
         attributes_1 = [
             'caress', 'freedom', 'health', 'love', 'peace', 'cheer', 'friend', 'heaven', 'loyal', 'pleasure',
             'diamond', 'gentle', 'honest', 'lucky', 'rainbow', 'diploma', 'gift', 'honor', 'miracle', 'sunrise',
@@ -919,6 +917,29 @@ class XWEAT(object):
         random.shuffle(targets_2)
         attributes_1 = self.load_word_list(self.wl_paths['career'])
         attributes_2 = self.load_word_list(self.wl_paths['crime_german'])
+        return targets_1, targets_2, attributes_1, attributes_2
+    
+    # religious bias tests
+    # pleasant - unpleasant
+    def weat_christianity_islam_pleasant_unpleasant(self):
+        targets_1 = self.load_names(self.wl_paths['christianity'])
+        targets_2 = self.load_names(self.wl_paths['islam'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    def weat_christianity_judaism_pleasant_unpleasant(self):
+        targets_1 = self.load_names(self.wl_paths['christianity'])
+        targets_2 = self.load_names(self.wl_paths['judaism'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
+        return targets_1, targets_2, attributes_1, attributes_2
+
+    def weat_islam_judaism_pleasant_unpleasant(self):
+        targets_1 = self.load_names(self.wl_paths['islam'])
+        targets_2 = self.load_names(self.wl_paths['judaism'])
+        attributes_1 = self.load_word_list(self.wl_paths['pleasant'])
+        attributes_2 = self.load_word_list(self.wl_paths['unpleasant'])
         return targets_1, targets_2, attributes_1, attributes_2
 
     # occupations
