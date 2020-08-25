@@ -66,7 +66,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-nf', '--names_file', required=True, help='Path to input file: list of names.')
     parser.add_argument('-o', '--out_file', required=True, help='Path to output file: filtered  list of names.')
-    parser.add_argument('-s', 'sort', required=True, type=bool, help='Sort names by occurrence count in corpora.')
+    parser.add_argument('-s', '--sort', required=True, type=bool, help='Sort names by occurrence count in corpora.')
     args = parser.parse_args()
     paths_vocs = [path_sde, path_htb, path_wiki]
     path_nf = args.names_file
