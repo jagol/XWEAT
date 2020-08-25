@@ -116,6 +116,6 @@ if __name__ == __name__:
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--fpath_in', required=True, help='Path to input file: one name or word per line.')
     parser.add_argument('-o', '--fpath_out', required=True, help='Path to output file: one sentence per line.')
-    parser.add_argument('-t', '--ttype', required=True, type=bool, help="Either 'name' or 'word'.")
+    parser.add_argument('-t', '--ttype', required=True, help="Either 'name' or 'word'.")
     args = parser.parse_args()
     create_filled_template_from_word_list(fpath_in=args.fpath_in, fpath_out=args.fpath_out, ttype=args.ttype)

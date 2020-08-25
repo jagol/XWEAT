@@ -306,7 +306,8 @@ class XWEAT(object):
         return targets_1, targets_2, attributes_1, attributes_2
 
     # missing from the original IAT: arab-muslim
-    def load_names(self, fpath):
+    @staticmethod
+    def load_names(fpath):
         title_lines = ['Male:', 'Female:']
         names = []
         with open(fpath) as f:
@@ -322,7 +323,8 @@ class XWEAT(object):
         random.shuffle(names)
         return names
 
-    def load_female_names(self, fpath):
+    @staticmethod
+    def load_female_names(fpath):
         names = []
         in_fem_names = False
         with open(fpath) as f:
@@ -336,7 +338,8 @@ class XWEAT(object):
             random.shuffle(names)
             return names
 
-    def load_male_names(self, fpath):
+    @staticmethod
+    def load_male_names(fpath):
         names = []
         with open(fpath) as f:
             for line in f:
