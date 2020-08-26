@@ -1,5 +1,5 @@
-# Templates from May et al. 2019
-# at: https://github.com/W4ngatang/sent-bias/blob/master/scripts/generate_basic_contexts.py
+# Templates from May et al. 2019: "On Measuring Bias in Sentence Encoders"
+# File: https://github.com/W4ngatang/sent-bias/blob/master/scripts/generate_basic_contexts.py
 
 
 from weat import XWEAT

@@ -4,6 +4,7 @@
 
 import torch
 import pytorch_pretrained_bert as bert
+from transformers import AutoTokenizer
 
 
 MODELS = {
@@ -20,8 +21,22 @@ MODELS = {
 }
 
 
-def load_model(version='bert-large-uncased'):
-    ''' Load BERT model and corresponding tokenizer '''
+
+TOKENIZERS = {
+    'bert-base-german-cased': 'bert-base-german-cased',
+    'dbmdz/bert-base-german-cased',
+    'bert-base-german-dbmdz-cased',
+    'severinsimmler/literary-german-bert',
+    'oliverguhr/german-sentiment-bert'
+}
+
+
+def load_tokenizer(version):
+    return AutoTokenizer.from_pretrained(TOKENIZERS[version])
+
+
+def load_model(version):
+    """Load BERT model and corresponding tokenizer."""
     tokenizer = bert.BertTokenizer.from_pretrained(version)
     model = bert.BertModel.from_pretrained(version)
     model.eval()
@@ -29,7 +44,7 @@ def load_model(version='bert-large-uncased'):
 
 
 def encode(model, tokenizer, texts):
-    ''' Use tokenizer and model to encode texts '''
+    """Use tokenizer and model to encode texts."""
     encs = {}
     for text in texts:
         tokenized = tokenizer.tokenize(text)
