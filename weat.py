@@ -334,7 +334,7 @@ class XWEAT(object):
                 if line == 'Female:':
                     in_fem_names = True
                     continue
-                if in_fem_names:
+                if in_fem_names and line:
                     names.append(line.lower())
             if shuffle:
                 random.shuffle(names)
@@ -352,6 +352,8 @@ class XWEAT(object):
                     if shuffle:
                         random.shuffle(names)
                     return names
+                if not line:
+                    continue
                 names.append(line.lower())
 
     def load_random_subset_of_names(self, fpath):
