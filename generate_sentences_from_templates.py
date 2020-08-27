@@ -14,7 +14,7 @@ def generate_cmds_names(data_dir, exec_dir):
         sent_fnm = sent_fn + '_male'
         name_file_dict[nf] = [fname + '.txt' for fname in [sent_fn, sent_fnf, sent_fnm]]
     for nf in name_file_dict:
-        for sent_fn, ttype in zip(name_file_dict[nf], ['name', 'mname', 'fname']):
+        for sent_fn, ttype in zip(name_file_dict[nf], ['name', 'fname', 'mname']):
             cmds.append(f'python3 templates.py -i {data_dir}{nf} -o {data_dir}{sent_fn} -t {ttype}')
     return cmds
 
