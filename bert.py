@@ -21,13 +21,9 @@ MODELS = {
 }
 
 
-
 TOKENIZERS = {
-    'bert-base-german-cased': 'bert-base-german-cased',
-    'dbmdz/bert-base-german-cased',
-    'bert-base-german-dbmdz-cased',
-    'severinsimmler/literary-german-bert',
-    'oliverguhr/german-sentiment-bert'
+    'deepset': 'bert-base-german-cased',
+    'dbmdz': 'bert-base-german-dbmdz-cased'
 }
 
 
