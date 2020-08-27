@@ -307,7 +307,7 @@ class XWEAT(object):
 
     # missing from the original IAT: arab-muslim
     @staticmethod
-    def load_names(fpath):
+    def load_names(fpath, shuffle=True):
         title_lines = ['Male:', 'Female:']
         names = []
         with open(fpath) as f:
@@ -320,11 +320,12 @@ class XWEAT(object):
                 if not line:
                     continue
                 names.append(line.lower())
-        random.shuffle(names)
+        if shuffle:
+            random.shuffle(names)
         return names
 
     @staticmethod
-    def load_female_names(fpath):
+    def load_female_names(fpath, shuffle=True):
         names = []
         in_fem_names = False
         with open(fpath) as f:
@@ -335,11 +336,12 @@ class XWEAT(object):
                     continue
                 if in_fem_names:
                     names.append(line.lower())
-            random.shuffle(names)
+            if shuffle:
+                random.shuffle(names)
             return names
 
     @staticmethod
-    def load_male_names(fpath):
+    def load_male_names(fpath, shuffle=True):
         names = []
         with open(fpath) as f:
             for line in f:
@@ -347,7 +349,8 @@ class XWEAT(object):
                 if line.startswith('source:') or line == 'Male:':
                     continue
                 if line == 'Female:':
-                    random.shuffle(names)
+                    if shuffle:
+                        random.shuffle(names)
                     return names
                 names.append(line.lower())
 
