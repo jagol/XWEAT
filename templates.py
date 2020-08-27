@@ -6,14 +6,13 @@ from weat import XWEAT
 
 
 NAME_TEMPLATES = (
-    'This is {term}.',
-    'That is {term}.',
-    'There is {term}.',
-    'Here is {term}.',
-    '{term} is here.',
-    '{term} is there.',
-    '{term} is a person.',
-    'The person\'s name is {term}.',
+    'Das ist {term}.',  # This is/That is
+    'Dort ist {term}.',  # There is
+    'Hier ist {term}.',  # Here is
+    '{term} ist hier.',  # is here
+    '{term} ist dort.',  # is there
+    '{term} ist eine Person.',  # is a person
+    'Der Name der Person ist {term}.',  # The person\'s name is
 )
 
 
@@ -74,13 +73,13 @@ PLURAL_NOUN_TEMPLATES = (
 class Template:
 
     def __init__(self, templates):
-        self.templates = templates
+        self.templates = templates  # List of tuples of templates
 
     def fill_templates(self, term):
         filled_templates = []
         for tp in self.templates:
             for t in tp:
-                filled_templates.append(t.format(term))
+                filled_templates.append(t.format(term=term))
         return filled_templates
 
     def fill_templates_mul_terms(self, terms):
@@ -93,19 +92,21 @@ class Template:
 def create_filled_template_from_word_list(fpath_in, fpath_out, ttype='name'):
     """Given a word-list file and a type (names, words) fill in templates and produce output file."""
     mapping = {
-        'name': NAME_TEMPLATES,
+        'name': [NAME_TEMPLATES],
+        'mname': [NAME_TEMPLATES],
+        'fname': [NAME_TEMPLATES]
     }
     if ttype == 'name':
-        terms = XWEAT.load_names(fpath_in)
+        terms = [s.capitalize() for s in XWEAT.load_names(fpath_in, shuffle=False)]
     elif ttype == 'mname':
-        terms = XWEAT.load_male_names(fpath_in)
+        terms = [s.capitalize() for s in XWEAT.load_male_names(fpath_in, shuffle=False)]
     elif ttype == 'fname':
-        terms = XWEAT.load_female_names(fpath_in)
+        terms = [s.capitalize() for s in XWEAT.load_female_names(fpath_in, shuffle=False)]
     elif ttype == 'words':
         terms = XWEAT.load_word_list(fpath_in)
     else:
         raise Exception(f'ttype {ttype} is not known.')
-    filled_templates = Template(mapping[ttype]).fill_templates(terms)
+    filled_templates = Template(mapping[ttype]).fill_templates_mul_terms(terms)
     with open(fpath_out, 'w') as fout:
         for ft in filled_templates:
             fout.write(ft + '\n')
@@ -116,6 +117,6 @@ if __name__ == __name__:
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--fpath_in', required=True, help='Path to input file: one name or word per line.')
     parser.add_argument('-o', '--fpath_out', required=True, help='Path to output file: one sentence per line.')
-    parser.add_argument('-t', '--ttype', required=True, help="Either 'name' or 'word'.")
+    parser.add_argument('-t', '--ttype', required=True, help="Either 'name', 'mname', 'fname' or 'word'.")
     args = parser.parse_args()
     create_filled_template_from_word_list(fpath_in=args.fpath_in, fpath_out=args.fpath_out, ttype=args.ttype)
